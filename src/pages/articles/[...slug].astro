@@ -1,0 +1,25 @@
+---
+import { getCollection, render } from 'astro:content';
+import ProseLayout from '../../layouts/ProseLayout.astro';
+import { excludeDrafts } from '../../lib/collections';
+import { formatIssueDate } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const articles = excludeDrafts(await getCollection('articles'));
+  return articles.map((article) => ({
+    params: { slug: article.id },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+---
+<ProseLayout
+  title={article.data.title}
+  description={article.data.summary}
+  eyebrow={`${article.data.discipline} · ${formatIssueDate(article.data.publishedAt)}`}
+  byline={`By ${article.data.author}`}
+>
+  <Content />
+</ProseLayout>

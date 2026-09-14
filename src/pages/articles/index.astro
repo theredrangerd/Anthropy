@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CollectionGrid from '../../components/CollectionGrid.astro';
+import { excludeDrafts, sortByDateDesc } from '../../lib/collections';
+import { formatIssueDate } from '../../lib/format';
+
+const articles = sortByDateDesc(
+  excludeDrafts(await getCollection('articles')),
+  (a) => a.data.publishedAt,
+);
+
+const items = articles.map((a) => ({
+  href: `/articles/${a.id}/`,
+  title: a.data.title,
+  meta: `${a.data.discipline} · ${a.data.author} · ${formatIssueDate(a.data.publishedAt)}`,
+  summary: a.data.summary,
+}));
+---
+<BaseLayout
+  title="Articles"
+  description="Research papers and essays written by Anthropy contributors."
+>
+  <section class="head">
+    <p class="eyebrow">Writing</p>
+    <h1>Articles</h1>
+    <p class="lede">Papers and essays by Anthropy contributors, across history, politics, society, economics, and culture.</p>
+  </section>
+  <CollectionGrid
+    items={items}
+    emptyMessage="Papers from this cycle are being finalised for publication."
+  />
+</BaseLayout>
+
+<style>
+  .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
+  .lede { font-family: var(--f-prose); font-size: var(--t-lg); color: var(--c-ink-soft); max-width: 52ch; }
+</style>

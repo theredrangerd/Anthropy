@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from 'astro:content';
+import ProseLayout from '../../layouts/ProseLayout.astro';
+import { excludeDrafts } from '../../lib/collections';
+import { formatIssueDate } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const issues = excludeDrafts(await getCollection('journal'));
+  return issues.map((issue) => ({
+    params: { slug: issue.id },
+    props: { issue },
+  }));
+}
+
+const { issue } = Astro.props;
+const { Content } = await render(issue);
+---
+<ProseLayout
+  title={issue.data.title}
+  description={issue.data.summary}
+  eyebrow={`Issue ${issue.data.issueNumber} · ${formatIssueDate(issue.data.publishedAt)}`}
+>
+  <Content />
+  {issue.data.pdf && (
+    <p><a href={issue.data.pdf}>Download the full issue (PDF)</a></p>
+  )}
+</ProseLayout>

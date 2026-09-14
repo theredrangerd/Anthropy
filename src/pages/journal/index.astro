@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CollectionGrid from '../../components/CollectionGrid.astro';
+import { excludeDrafts, sortByDateDesc } from '../../lib/collections';
+import { formatIssueDate } from '../../lib/format';
+
+const issues = sortByDateDesc(
+  excludeDrafts(await getCollection('journal')),
+  (i) => i.data.publishedAt,
+);
+
+const items = issues.map((i) => ({
+  href: `/journal/${i.id}/`,
+  title: i.data.title,
+  meta: `Issue ${i.data.issueNumber} · ${formatIssueDate(i.data.publishedAt)}`,
+  summary: i.data.summary,
+}));
+---
+<BaseLayout
+  title="Journal"
+  description="The Anthropy Academic Journal collects peer-supported research written by secondary students."
+>
+  <section class="head">
+    <p class="eyebrow">Publication</p>
+    <h1>The Anthropy Academic Journal</h1>
+    <p class="lede">
+      Each issue collects research written by students in the In2Academia programme and
+      edited with academic mentors.
+    </p>
+  </section>
+  <CollectionGrid
+    items={items}
+    emptyMessage="The inaugural issue is in preparation. Check back, or write to us if you would like to contribute."
+  />
+</BaseLayout>
+
+<style>
+  .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
+  .lede { font-family: var(--f-prose); font-size: var(--t-lg); color: var(--c-ink-soft); max-width: 52ch; }
+</style>
