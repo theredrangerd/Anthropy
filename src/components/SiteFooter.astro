@@ -1,0 +1,54 @@
+---
+import site from '../data/site.json';
+const year = new Date().getUTCFullYear();
+const socials = site.socials.filter((s) => !s.url.startsWith('REPLACE_WITH'));
+const hasEmail = !site.contactEmail.startsWith('REPLACE_WITH');
+---
+<footer class="site-footer">
+  <div class="page-shell inner">
+    <p class="tagline">{site.tagline}</p>
+    <div class="meta">
+      <span>{site.name} · Established {site.established} · {site.basedAt}</span>
+      {hasEmail && <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>}
+      {socials.length > 0 && (
+        <ul>
+          {socials.map((s) => (
+            <li><a href={s.url}>{s.label}</a></li>
+          ))}
+        </ul>
+      )}
+      <span class="copy">© {year} {site.name}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--c-rule);
+    margin-top: var(--s-24);
+    padding-block: var(--s-12);
+    background: var(--c-sunk);
+  }
+  .inner { display: grid; gap: var(--s-6); }
+  .tagline {
+    font-family: var(--f-prose);
+    font-size: var(--t-lg);
+    font-style: italic;
+    color: var(--c-ink-soft);
+    max-width: 46ch;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-6);
+    font-size: var(--t-sm);
+    color: var(--c-ink-faint);
+  }
+  .meta ul {
+    display: flex;
+    gap: var(--s-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>
