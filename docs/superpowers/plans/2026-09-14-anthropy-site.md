@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- **Node:** v24.16.0 available; require Node >= 20.
+- **Node:** v24.16.0 available; require Node >= 22.12.0 (the floor declared by `astro@7.3.2` and `@astrojs/mdx@8.0.1` themselves — a lower floor in our own manifest would mislead contributors into an install that then fails).
 - **Output must be fully static.** No SSR adapter, no server runtime, no database, no login. `output: 'static'`.
 - **Site URL:** `https://anthropy.wetkarma.com` — set as `site` in `astro.config.mjs`. All internal links must be root-relative (`/journal/`), never absolute to a domain, so relocation is a DNS change plus a file copy.
 - **Never fabricate real people or outcomes.** Alumni names/universities, leadership bios, speaker names, and paper authors are real-world claims. Seed files use content explicitly labelled as an example template. Do not invent a plausible-looking name, university, or quotation anywhere in this build. Where real data is absent, components must render a clean empty state, never placeholder people.
