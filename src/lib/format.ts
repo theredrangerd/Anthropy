@@ -7,3 +7,8 @@ const MONTHS = [
 export function formatIssueDate(date: Date): string {
   return `${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
 }
+
+/** Formats a date as "D Month YYYY" in UTC. */
+export function formatEventDate(date: Date): string {
+  return `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+}
