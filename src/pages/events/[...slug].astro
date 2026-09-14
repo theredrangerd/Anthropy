@@ -1,0 +1,25 @@
+---
+import { getCollection, render } from 'astro:content';
+import ProseLayout from '../../layouts/ProseLayout.astro';
+import { excludeDrafts } from '../../lib/collections';
+import { formatEventDate } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const events = excludeDrafts(await getCollection('events'));
+  return events.map((event) => ({
+    params: { slug: event.id },
+    props: { event },
+  }));
+}
+
+const { event } = Astro.props;
+const { Content } = await render(event);
+const kind = event.data.format === 'week' ? 'Week-long programme' : 'One-day forum';
+---
+<ProseLayout
+  title={event.data.name}
+  description={event.data.summary}
+  eyebrow={`${kind} · ${formatEventDate(event.data.startsAt)}`}
+>
+  <Content />
+</ProseLayout>

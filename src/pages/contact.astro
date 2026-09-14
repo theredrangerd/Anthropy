@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import site from '../data/site.json';
+
+const hasEmail = !site.contactEmail.startsWith('REPLACE_WITH');
+const socials = site.socials.filter((s) => !s.url.startsWith('REPLACE_WITH'));
+---
+<BaseLayout
+  title="Contact"
+  description="Get in touch with Anthropy — for speaking, for joining In2Academia, or for anything else."
+>
+  <section class="head">
+    <p class="eyebrow">Contact</p>
+    <h1>Get in touch</h1>
+  </section>
+
+  <div class="routes">
+    <article>
+      <h2>Speaking with us</h2>
+      <p>
+        If you are a researcher or academic interested in speaking at Humanities Focus, we
+        would like to hear from you. Tell us roughly what you work on — we will handle the
+        rest.
+      </p>
+    </article>
+    <article>
+      <h2>Joining In2Academia</h2>
+      <p>
+        Students who want to know when the next programme cycle opens can write to us, or
+        follow our channels for the announcement.
+      </p>
+    </article>
+    <article>
+      <h2>Everything else</h2>
+      <p>Questions from teachers, schools, and anyone curious about what we do.</p>
+    </article>
+  </div>
+
+  <div class="how">
+    {hasEmail ? (
+      <p class="email"><a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a></p>
+    ) : (
+      <p class="empty">Contact details are being finalised.</p>
+    )}
+    {socials.length > 0 && (
+      <ul>
+        {socials.map((s) => <li><a href={s.url}>{s.label}</a></li>)}
+      </ul>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
+  .routes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--s-8);
+    padding-block: var(--s-8);
+  }
+  .routes article { display: grid; gap: var(--s-2); }
+  .routes h2 { font-size: var(--t-lg); }
+  .routes p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 40ch; }
+  .how { padding-block: var(--s-12); display: grid; gap: var(--s-4); border-top: 1px solid var(--c-rule); }
+  .email { font-family: var(--f-display); font-size: var(--t-xl); }
+  .how ul { display: flex; gap: var(--s-6); list-style: none; margin: 0; padding: 0; }
+  .empty { font-family: var(--f-prose); font-style: italic; color: var(--c-ink-faint); }
+</style>

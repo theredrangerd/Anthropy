@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CollectionGrid from '../../components/CollectionGrid.astro';
+import { excludeDrafts, sortByDateDesc } from '../../lib/collections';
+import { formatEventDate } from '../../lib/format';
+
+const all = sortByDateDesc(
+  excludeDrafts(await getCollection('events')),
+  (e) => e.data.startsAt,
+);
+
+const upcoming = all.filter((e) => e.data.upcoming);
+const past = all.filter((e) => !e.data.upcoming);
+
+const toItem = (e: (typeof all)[number]) => ({
+  href: `/events/${e.id}/`,
+  title: e.data.name,
+  meta: formatEventDate(e.data.startsAt),
+  summary: e.data.summary,
+});
+---
+<BaseLayout
+  title="Events"
+  description="Anthropy's speaker programme brings researchers and academics into direct conversation with secondary students."
+>
+  <section class="head">
+    <p class="eyebrow">Speaker programme</p>
+    <h1>Humanities Focus</h1>
+    <p class="lede">
+      For several years we ran Humanities Focus Week: a week of talks from researchers and
+      academics. This year the programme is concentrating into a single-day forum — fewer
+      sessions, longer conversations, the same purpose.
+    </p>
+  </section>
+
+  {upcoming.length > 0 && (
+    <section class="block">
+      <h2>Next</h2>
+      <CollectionGrid items={upcoming.map(toItem)} emptyMessage="" />
+    </section>
+  )}
+
+  <section class="block">
+    <h2>Previously</h2>
+    <CollectionGrid
+      items={past.map(toItem)}
+      emptyMessage="Records of previous programmes are being written up."
+    />
+  </section>
+</BaseLayout>
+
+<style>
+  .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
+  .lede { font-family: var(--f-prose); font-size: var(--t-lg); color: var(--c-ink-soft); max-width: 54ch; }
+  .block { display: grid; gap: var(--s-6); padding-block: var(--s-12); }
+</style>

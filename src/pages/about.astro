@@ -1,0 +1,43 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+import site from '../data/site.json';
+---
+<ProseLayout
+  title="About Anthropy"
+  description="Anthropy is a student-led humanities research organization based at UWC Dover."
+  eyebrow={`Established ${site.established} · ${site.basedAt}`}
+>
+  <p>
+    Anthropy is a student-led organization for humanities research. We are based at UWC
+    South East Asia's Dover Campus, with contributors from UWC East and from outside
+    Singapore.
+  </p>
+  <p>
+    We exist because the distance between being interested in the humanities and doing
+    humanities research is larger than it should be, and almost nothing bridges it at
+    secondary school. A student who is curious about political theory or economic history
+    is usually told to wait until university. We think that is a waste of several years of
+    genuine intellectual appetite.
+  </p>
+
+  <h2>What we do</h2>
+  <p>
+    <strong>In2Academia</strong> is our research programme. Over ten weeks and ten
+    workshops, students move from a vague interest to a defined research question to a
+    finished paper, working alongside academic mentors. Strong papers are published in our
+    academic journal.
+  </p>
+  <p>
+    <strong>Humanities Focus</strong> is our speaker programme. We bring researchers,
+    academics, and professionals in to speak directly with students — not as a careers
+    talk, but as a conversation about what the work actually involves.
+  </p>
+
+  <h2>What we are not</h2>
+  <p>
+    We are not a think tank, and we do not claim our students' work changes fields. The
+    point is the other direction: the students who learn to do this work properly now are
+    the ones who will change those fields later. The journal exists so that work is taken
+    seriously, and so the people who wrote it can point to it.
+  </p>
+</ProseLayout>
