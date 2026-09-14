@@ -2270,7 +2270,9 @@ const { from, to } = Astro.props;
     margin-right: 0.3em;
     display: none;
   }
-  .revision[data-armed='true'] .struck { display: inline; }
+  /* inline-block, not inline: the strike keyframe animates max-width,
+     which has no effect on a non-replaced inline element. */
+  .revision[data-armed='true'] .struck { display: inline-block; }
   .revision[data-armed='true'] .final {
     background-image: linear-gradient(var(--c-sage-soft), var(--c-sage-soft));
     background-repeat: no-repeat;
@@ -2382,7 +2384,14 @@ test('the effect is contained to two placements site-wide', async ({ page }) => 
 test('the draft text is inserted only when motion is allowed', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
-  await expect(page.locator('.lede .struck')).toHaveText('just interested in');
+  // Assert on textContent rather than toHaveText: the collapse animation ends at
+  // max-width 0, giving a zero bounding box, so a visibility-aware matcher would
+  // race the animation and flake.
+  await expect
+    .poll(async () =>
+      page.locator('.lede .struck').evaluate((el) => el.textContent?.trim()),
+    )
+    .toBe('just interested in');
 });
 
 test('about page states what Anthropy is not', async ({ page }) => {
