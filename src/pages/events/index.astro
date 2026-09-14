@@ -37,7 +37,8 @@ const toItem = (e: (typeof all)[number]) => ({
   {upcoming.length > 0 && (
     <section class="block">
       <h2>Next</h2>
-      <CollectionGrid items={upcoming.map(toItem)} emptyMessage="" />
+      {/* emptyMessage is unreachable here: this block only renders when upcoming.length > 0 */}
+      <CollectionGrid items={upcoming.map(toItem)} emptyMessage="The next forum is being scheduled." />
     </section>
   )}
 

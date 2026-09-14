@@ -27,6 +27,10 @@ const previous = years.filter((y) => y.id !== current?.id);
     </nav>
   )}
 
+  {years.length === 0 && (
+    <p class="empty">The leadership roster is being recorded.</p>
+  )}
+
   {current && (
     <section class="year" id={`year-${current.data.startYear}`}>
       <h2>{current.data.academicYear}</h2>
