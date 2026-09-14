@@ -1,0 +1,73 @@
+:root {
+  /* Ground & ink — light */
+  --c-ground: #FBF9F4;
+  --c-surface: #FFFFFF;
+  --c-sunk: #F2EEE5;
+  --c-ink: #14243A;
+  --c-ink-soft: #46566C;
+  --c-ink-faint: #77869A;
+  --c-rule: #E0DACD;
+
+  /* Accents */
+  --c-sage: #4E6B57;
+  --c-sage-soft: #E6EDE6;
+  --c-rust: #A8492A;
+  --c-rust-soft: #F6E7E0;
+
+  /* Type */
+  --f-display: 'Fraunces', Georgia, serif;
+  --f-prose: 'Newsreader', Georgia, serif;
+  --f-ui: 'Archivo', -apple-system, 'Segoe UI', sans-serif;
+
+  --t-xs: 0.78rem;
+  --t-sm: 0.9rem;
+  --t-base: 1.0625rem;
+  --t-lg: 1.3rem;
+  --t-xl: 1.75rem;
+  --t-2xl: 2.4rem;
+  --t-3xl: 3.4rem;
+
+  /* Space */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-12: 3rem;
+  --s-16: 4rem;
+  --s-24: 6rem;
+
+  --measure: 66ch;
+  --page-max: 1120px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --c-ground: #101A26;
+    --c-surface: #16222F;
+    --c-sunk: #0B131C;
+    --c-ink: #EDE8DD;
+    --c-ink-soft: #B8C2CD;
+    --c-ink-faint: #808E9D;
+    --c-rule: #27343F;
+    --c-sage: #8FB097;
+    --c-sage-soft: #1B2A22;
+    --c-rust: #D9845F;
+    --c-rust-soft: #2E1B14;
+  }
+}
+
+:root[data-theme='dark'] {
+  --c-ground: #101A26;
+  --c-surface: #16222F;
+  --c-sunk: #0B131C;
+  --c-ink: #EDE8DD;
+  --c-ink-soft: #B8C2CD;
+  --c-ink-faint: #808E9D;
+  --c-rule: #27343F;
+  --c-sage: #8FB097;
+  --c-sage-soft: #1B2A22;
+  --c-rust: #D9845F;
+  --c-rust-soft: #2E1B14;
+}

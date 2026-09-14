@@ -1,0 +1,79 @@
+@import './tokens.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--c-ground);
+  color: var(--c-ink);
+  font-family: var(--f-ui);
+  font-size: var(--t-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+h1 { font-size: var(--t-3xl); }
+h2 { font-size: var(--t-2xl); }
+h3 { font-size: var(--t-lg); }
+
+p { margin: 0; }
+
+a { color: inherit; text-decoration-color: var(--c-sage); text-underline-offset: 0.18em; }
+a:hover { text-decoration-color: var(--c-ink); }
+
+:focus-visible {
+  outline: 2px solid var(--c-sage);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+.page-shell {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--s-6);
+}
+
+.eyebrow {
+  font-family: var(--f-ui);
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-ink-faint);
+}
+
+/* Long-form reading */
+.prose { font-family: var(--f-prose); font-size: 1.14rem; line-height: 1.72; max-width: var(--measure); }
+.prose > * + * { margin-top: var(--s-4); }
+.prose h2 { margin-top: var(--s-12); }
+.prose h3 { margin-top: var(--s-8); }
+.prose blockquote {
+  font-style: italic;
+  color: var(--c-ink-soft);
+  padding-left: var(--s-6);
+  border-left: 1px solid var(--c-rule);
+  margin-left: 0;
+}
+
+/* Any wide element scrolls itself, never the page */
+.scroll-x { overflow-x: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
