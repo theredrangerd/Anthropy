@@ -1,0 +1,67 @@
+---
+interface Props {
+  from: string;
+  to: string;
+}
+const { from, to } = Astro.props;
+---
+<span class="revision" data-revision data-from={from}>
+  <span class="struck" aria-hidden="true"></span><span class="final">{to}</span>
+</span>
+
+<style>
+  .revision { position: relative; }
+  .struck {
+    color: var(--c-ink-faint);
+    text-decoration: line-through;
+    text-decoration-color: var(--c-rust);
+    text-decoration-thickness: 2px;
+    margin-right: 0.3em;
+    display: none;
+  }
+  /* inline-block, not inline: the strike keyframe animates max-width,
+     which has no effect on a non-replaced inline element. */
+  .revision[data-armed='true'] .struck { display: inline-block; }
+  .revision[data-armed='true'] .final {
+    background-image: linear-gradient(var(--c-sage-soft), var(--c-sage-soft));
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+  }
+  .revision[data-revealed='true'] .struck {
+    animation: strike 420ms ease forwards;
+  }
+  .revision[data-revealed='true'] .final {
+    animation: wash 520ms 260ms ease forwards;
+  }
+  @keyframes strike {
+    to { opacity: 0; max-width: 0; margin-right: 0; }
+  }
+  @keyframes wash {
+    from { background-size: 0% 100%; }
+    to { background-size: 100% 100%; }
+  }
+</style>
+
+<script>
+  // Progressive enhancement: without JS, or with reduced motion, the final text
+  // is simply already correct. The struck draft is only ever inserted by script.
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduced) {
+    const nodes = document.querySelectorAll<HTMLElement>('[data-revision]');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          const struck = el.querySelector<HTMLElement>('.struck');
+          if (struck) struck.textContent = el.dataset.from ?? '';
+          el.dataset.armed = 'true';
+          requestAnimationFrame(() => { el.dataset.revealed = 'true'; });
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.6 },
+    );
+    for (const node of nodes) observer.observe(node);
+  }
+</script>

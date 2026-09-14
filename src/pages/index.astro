@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProofBand from '../components/ProofBand.astro';
 import CollectionGrid from '../components/CollectionGrid.astro';
+import RevisionReveal from '../components/RevisionReveal.astro';
 import { excludeDrafts, sortByDateDesc } from '../lib/collections';
 import { formatIssueDate, formatEventDate } from '../lib/format';
 import site from '../data/site.json';
@@ -44,7 +45,8 @@ const issueItems = issues.map((i) => ({
     <p class="lede">
       Anthropy runs a research programme, publishes a student academic journal, and brings
       working academics into direct conversation with secondary students. Everything here is
-      produced by students who were learning to do research when they started.
+      produced by students who were
+      <RevisionReveal from="just interested in" to="learning to do" /> research when they started.
     </p>
   </section>
 

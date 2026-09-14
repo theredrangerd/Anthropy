@@ -1,5 +1,6 @@
 ---
 import ProseLayout from '../layouts/ProseLayout.astro';
+import RevisionReveal from '../components/RevisionReveal.astro';
 import site from '../data/site.json';
 ---
 <ProseLayout
@@ -35,9 +36,10 @@ import site from '../data/site.json';
 
   <h2>What we are not</h2>
   <p>
-    We are not a think tank, and we do not claim our students' work changes fields. The
-    point is the other direction: the students who learn to do this work properly now are
-    the ones who will change those fields later. The journal exists so that work is taken
-    seriously, and so the people who wrote it can point to it.
+    We are <RevisionReveal from="a small think tank" to="not a think tank" />, and we do not
+    claim our students' work changes fields. The point is the other direction: the students
+    who learn to do this work properly now are the ones who will change those fields later.
+    The journal exists so that work is taken seriously, and so the people who wrote it can
+    point to it.
   </p>
 </ProseLayout>
