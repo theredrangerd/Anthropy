@@ -1,0 +1,50 @@
+---
+import alumni from '../data/alumni.json';
+
+interface Outcome {
+  name: string;
+  destination: string;
+  note?: string;
+}
+
+const outcomes = alumni.outcomes as Outcome[];
+---
+{outcomes.length > 0 && (
+  <section class="proof" aria-labelledby="proof-heading">
+    <p class="eyebrow" id="proof-heading">Where our contributors go next</p>
+    <ul>
+      {outcomes.map((o) => (
+        <li>
+          <span class="dest">{o.destination}</span>
+          <span class="who">{o.name}</span>
+          {o.note && <span class="note">{o.note}</span>}
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  .proof {
+    border-block: 1px solid var(--c-rule);
+    padding-block: var(--s-8);
+    display: grid;
+    gap: var(--s-6);
+  }
+  .proof ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--s-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .proof li { display: grid; gap: var(--s-1); }
+  .dest {
+    font-family: var(--f-display);
+    font-size: var(--t-lg);
+    color: var(--c-ink);
+  }
+  .who { font-size: var(--t-sm); color: var(--c-ink-soft); }
+  .note { font-size: var(--t-xs); color: var(--c-ink-faint); }
+</style>

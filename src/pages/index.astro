@@ -1,6 +1,119 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ProofBand from '../components/ProofBand.astro';
+import CollectionGrid from '../components/CollectionGrid.astro';
+import { excludeDrafts, sortByDateDesc } from '../lib/collections';
+import { formatIssueDate, formatEventDate } from '../lib/format';
+import site from '../data/site.json';
+
+const articles = sortByDateDesc(
+  excludeDrafts(await getCollection('articles')),
+  (a) => a.data.publishedAt,
+).slice(0, 3);
+
+const issues = sortByDateDesc(
+  excludeDrafts(await getCollection('journal')),
+  (i) => i.data.publishedAt,
+).slice(0, 2);
+
+const upcoming = excludeDrafts(await getCollection('events'))
+  .filter((e) => e.data.upcoming);
+
+const articleItems = articles.map((a) => ({
+  href: `/articles/${a.id}/`,
+  title: a.data.title,
+  meta: `${a.data.discipline} · ${formatIssueDate(a.data.publishedAt)}`,
+  summary: a.data.summary,
+}));
+
+const issueItems = issues.map((i) => ({
+  href: `/journal/${i.id}/`,
+  title: i.data.title,
+  meta: `Issue ${i.data.issueNumber} · ${formatIssueDate(i.data.publishedAt)}`,
+  summary: i.data.summary,
+}));
 ---
-<BaseLayout title="Anthropy" description="Humanities research at UWC Dover.">
-  <h1>Anthropy</h1>
+<BaseLayout
+  title="Anthropy"
+  description="Anthropy is a student-led humanities research organization at UWC Dover. We publish student research and bring academics into conversation with the students who will follow them."
+>
+  <section class="thesis">
+    <p class="eyebrow">Humanities research · UWC Dover · Est. {site.established}</p>
+    <h1>We do not set out to change the humanities. We set out to prepare the people who will.</h1>
+    <p class="lede">
+      Anthropy runs a research programme, publishes a student academic journal, and brings
+      working academics into direct conversation with secondary students. Everything here is
+      produced by students who were learning to do research when they started.
+    </p>
+  </section>
+
+  <ProofBand />
+
+  <section class="block">
+    <h2>Recent work</h2>
+    <CollectionGrid
+      items={articleItems}
+      emptyMessage="The first papers of this cycle are being prepared for publication."
+    />
+  </section>
+
+  <section class="block">
+    <h2>The journal</h2>
+    <CollectionGrid
+      items={issueItems}
+      emptyMessage="The inaugural issue is in preparation."
+    />
+  </section>
+
+  <section class="block programmes">
+    <h2>What we run</h2>
+    <div class="two">
+      <article>
+        <h3><a href="/in2academia/">In2Academia</a></h3>
+        <p>
+          A ten-week programme teaching secondary students how to actually conduct humanities
+          research — from question to argument to a paper that gets published.
+        </p>
+      </article>
+      <article>
+        <h3><a href="/events/">Humanities Focus</a></h3>
+        <p>
+          Our speaker programme brings researchers and academics in to talk directly with
+          students.
+          {upcoming.length > 0 && (
+            <span> Next: {formatEventDate(upcoming[0].data.startsAt)}.</span>
+          )}
+        </p>
+      </article>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .thesis {
+    display: grid;
+    gap: var(--s-6);
+    padding-block: var(--s-24) var(--s-16);
+  }
+  .thesis h1 { max-width: 18ch; }
+  .lede {
+    font-family: var(--f-prose);
+    font-size: var(--t-lg);
+    color: var(--c-ink-soft);
+    max-width: 52ch;
+  }
+  .block {
+    display: grid;
+    gap: var(--s-6);
+    padding-block: var(--s-16);
+  }
+  .two {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--s-8);
+  }
+  .two article { display: grid; gap: var(--s-2); }
+  .two p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 46ch; }
+  .two h3 a { text-decoration: none; }
+</style>
