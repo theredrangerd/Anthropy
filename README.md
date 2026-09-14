@@ -5,7 +5,7 @@ UWC South East Asia, Dover Campus.
 
 - **Design spec:** `docs/superpowers/specs/2026-09-14-anthropy-site-design.md`
 - **Editing content:** `docs/CONTENT-GUIDE.md` ← start here if you are updating the site
-- **Live at:** https://anthropy.wetkarma.com
+- **Host:** https://anthropy.wetkarma.com
 
 ## Development
 

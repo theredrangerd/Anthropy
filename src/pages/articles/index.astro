@@ -26,13 +26,17 @@ const items = articles.map((a) => ({
     <h1>Articles</h1>
     <p class="lede">Papers and essays by Anthropy contributors, across history, politics, society, economics, and culture.</p>
   </section>
-  <CollectionGrid
-    items={items}
-    emptyMessage="Papers from this cycle are being finalised for publication."
-  />
+  <section class="block">
+    <h2>All papers</h2>
+    <CollectionGrid
+      items={items}
+      emptyMessage="Papers from this cycle are being finalized for publication."
+    />
+  </section>
 </BaseLayout>
 
 <style>
   .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
   .lede { font-family: var(--f-prose); font-size: var(--t-lg); color: var(--c-ink-soft); max-width: 52ch; }
+  .block { display: grid; gap: var(--s-6); padding-block: var(--s-8); }
 </style>

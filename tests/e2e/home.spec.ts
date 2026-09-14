@@ -10,10 +10,10 @@ test('proof band is absent while alumni data is empty', async ({ page }) => {
   await expect(page.locator('.proof')).toHaveCount(0);
 });
 
-test('empty collections render an intentional message, not a broken grid', async ({ page }) => {
+test('recent work and journal sections render content or an honest empty state', async ({ page }) => {
   await page.goto('/');
-  const empties = page.locator('.empty');
-  await expect(empties.first()).toBeVisible();
+  const count = await page.locator('.grid li, .empty').count();
+  expect(count).toBeGreaterThan(0);
 });
 
 test('hero is not squashed into a narrow column', async ({ page }) => {

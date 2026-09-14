@@ -19,7 +19,7 @@ const items = issues.map((i) => ({
 ---
 <BaseLayout
   title="Journal"
-  description="The Anthropy Academic Journal collects peer-supported research written by secondary students."
+  description="The Anthropy Academic Journal collects research by secondary students, edited with academic mentors."
 >
   <section class="head">
     <p class="eyebrow">Publication</p>
@@ -29,13 +29,17 @@ const items = issues.map((i) => ({
       edited with academic mentors.
     </p>
   </section>
-  <CollectionGrid
-    items={items}
-    emptyMessage="The inaugural issue is in preparation. Check back, or write to us if you would like to contribute."
-  />
+  <section class="block">
+    <h2>Issues</h2>
+    <CollectionGrid
+      items={items}
+      emptyMessage="The inaugural issue is in preparation. Check back, or write to us if you would like to contribute."
+    />
+  </section>
 </BaseLayout>
 
 <style>
   .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
   .lede { font-family: var(--f-prose); font-size: var(--t-lg); color: var(--c-ink-soft); max-width: 52ch; }
+  .block { display: grid; gap: var(--s-6); padding-block: var(--s-8); }
 </style>

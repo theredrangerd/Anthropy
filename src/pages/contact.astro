@@ -14,7 +14,7 @@ const socials = site.socials.filter((s) => !s.url.startsWith('REPLACE_WITH'));
     <h1>Get in touch</h1>
   </section>
 
-  <div class="routes">
+  <div class="routes auto-grid">
     <article>
       <h2>Speaking with us</h2>
       <p>
@@ -26,8 +26,8 @@ const socials = site.socials.filter((s) => !s.url.startsWith('REPLACE_WITH'));
     <article>
       <h2>Joining In2Academia</h2>
       <p>
-        Students who want to know when the next programme cycle opens can write to us, or
-        follow our channels for the announcement.
+        Students who want to know when the next programme cycle opens can write to us
+        directly and we will let you know when it does.
       </p>
     </article>
     <article>
@@ -53,9 +53,7 @@ const socials = site.socials.filter((s) => !s.url.startsWith('REPLACE_WITH'));
 <style>
   .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
   .routes {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: var(--s-8);
+    --auto-grid-min: 280px;
     padding-block: var(--s-8);
   }
   .routes article { display: grid; gap: var(--s-2); }

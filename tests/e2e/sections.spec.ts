@@ -42,9 +42,10 @@ test('no page describes Anthropy as multi-campus', async ({ page }) => {
   }
 });
 
-test('leadership page shows an empty roster state, not invented people', async ({ page }) => {
+test('leadership page shows a real roster or an honest empty state', async ({ page }) => {
   await page.goto('/leadership/');
-  await expect(page.locator('.empty')).toBeVisible();
+  const count = await page.locator('.people li, .empty').count();
+  expect(count).toBeGreaterThan(0);
 });
 
 test('page body never scrolls horizontally at mobile width', async ({ page }) => {

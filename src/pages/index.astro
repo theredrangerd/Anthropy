@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ProofBand from '../components/ProofBand.astro';
 import CollectionGrid from '../components/CollectionGrid.astro';
 import RevisionReveal from '../components/RevisionReveal.astro';
-import { excludeDrafts, sortByDateDesc } from '../lib/collections';
+import { excludeDrafts, sortByDateDesc, sortByDateAsc } from '../lib/collections';
 import { formatIssueDate, formatEventDate } from '../lib/format';
 import site from '../data/site.json';
 
@@ -18,8 +18,10 @@ const issues = sortByDateDesc(
   (i) => i.data.publishedAt,
 ).slice(0, 2);
 
-const upcoming = excludeDrafts(await getCollection('events'))
-  .filter((e) => e.data.upcoming);
+const upcoming = sortByDateAsc(
+  excludeDrafts(await getCollection('events')).filter((e) => e.data.upcoming),
+  (e) => e.data.startsAt,
+);
 
 const articleItems = articles.map((a) => ({
   href: `/articles/${a.id}/`,
@@ -70,7 +72,7 @@ const issueItems = issues.map((i) => ({
 
   <section class="block programmes">
     <h2>What we run</h2>
-    <div class="two">
+    <div class="two auto-grid">
       <article>
         <h3><a href="/in2academia/">In2Academia</a></h3>
         <p>
@@ -111,9 +113,7 @@ const issueItems = issues.map((i) => ({
     padding-block: var(--s-16);
   }
   .two {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--s-8);
+    --auto-grid-min: 280px;
   }
   .two article { display: grid; gap: var(--s-2); }
   .two p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 46ch; }

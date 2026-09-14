@@ -81,7 +81,7 @@ Create a file in `src/content/events/`:
 
 ```markdown
 ---
-name: "Humanities Focus Forum"
+name: "Name of the event"
 year: 2027
 format: "forum"
 startsAt: 2027-11-01
@@ -95,6 +95,11 @@ Details about the programme, speakers, and sessions.
 
 `format` is either `"week"` or `"forum"`. Set `upcoming: true` for the next event
 and change it to `false` once it has happened.
+
+**Before you un-draft `src/content/events/2026-forum.md`**, replace its `name:` field
+with the confirmed event name. It currently holds a `PENDING —` placeholder because
+the 2026 one-day forum has not been named yet. Setting `draft: false` without fixing
+the name publishes that placeholder text to a live page.
 
 ## Adding a leadership year
 
@@ -126,7 +131,7 @@ Edit `src/data/alumni.json`. Only add people who have agreed to be listed:
 ```json
 {
   "outcomes": [
-    { "name": "Full Name", "destination": "Georgetown University", "note": "Class of 2025" }
+    { "name": "Full Name", "destination": "University name", "note": "Class of YYYY" }
   ]
 }
 ```

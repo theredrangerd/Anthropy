@@ -37,7 +37,7 @@ const previous = years.filter((y) => y.id !== current?.id);
       {current.data.members.length === 0 ? (
         <p class="empty">This year's team is being confirmed.</p>
       ) : (
-        <ul class="people">
+        <ul class="people auto-grid">
           {current.data.members.map((m) => (
             <li>
               <p class="name">{m.name}</p>
@@ -57,7 +57,7 @@ const previous = years.filter((y) => y.id !== current?.id);
       {y.data.members.length === 0 ? (
         <p class="empty">Roster not yet recorded.</p>
       ) : (
-        <ul class="people">
+        <ul class="people auto-grid">
           {y.data.members.map((m) => (
             <li>
               <p class="name">{m.name}</p>
@@ -84,12 +84,7 @@ const previous = years.filter((y) => y.id !== current?.id);
   }
   .year { padding-block: var(--s-8); border-top: 1px solid var(--c-rule); display: grid; gap: var(--s-6); }
   .people {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--s-8);
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    --auto-grid-min: 220px;
   }
   .people li { display: grid; gap: var(--s-1); }
   .name { font-family: var(--f-display); font-size: var(--t-lg); }

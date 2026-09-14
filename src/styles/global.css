@@ -57,8 +57,8 @@ img { max-width: 100%; height: auto; display: block; }
 /* Long-form reading */
 .prose { font-family: var(--f-prose); font-size: 1.14rem; line-height: 1.72; max-width: var(--measure); }
 .prose > * + * { margin-top: var(--s-4); }
-.prose h2 { margin-top: var(--s-12); }
-.prose h3 { margin-top: var(--s-8); }
+.prose h2 { margin-top: var(--s-12); font-size: var(--t-xl); }
+.prose h3 { margin-top: var(--s-8); font-size: var(--t-lg); }
 .prose blockquote {
   font-style: italic;
   color: var(--c-ink-soft);
@@ -69,6 +69,17 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* Any wide element scrolls itself, never the page */
 .scroll-x { overflow-x: auto; }
+
+/* One auto-fitting grid, parametrized. --auto-grid-min is the column floor;
+   min(100%, …) keeps a single column from exceeding a narrow viewport. */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--auto-grid-min, 260px)), 1fr));
+  gap: var(--auto-grid-gap, var(--s-8));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

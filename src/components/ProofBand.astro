@@ -12,7 +12,7 @@ const outcomes = alumni.outcomes as Outcome[];
 {outcomes.length > 0 && (
   <section class="proof" aria-labelledby="proof-heading">
     <p class="eyebrow" id="proof-heading">Where our contributors go next</p>
-    <ul>
+    <ul class="auto-grid">
       {outcomes.map((o) => (
         <li>
           <span class="dest">{o.destination}</span>
@@ -32,12 +32,8 @@ const outcomes = alumni.outcomes as Outcome[];
     gap: var(--s-6);
   }
   .proof ul {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--s-6);
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    --auto-grid-min: 220px;
+    --auto-grid-gap: var(--s-6);
   }
   .proof li { display: grid; gap: var(--s-1); }
   .dest {

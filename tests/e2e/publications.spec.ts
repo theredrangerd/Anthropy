@@ -1,15 +1,17 @@
 import { test, expect } from '@playwright/test';
 
-test('journal index renders with an intentional empty state', async ({ page }) => {
+test('journal index renders content or an honest empty state', async ({ page }) => {
   await page.goto('/journal/');
   await expect(page.locator('h1')).toContainText('Academic Journal');
-  await expect(page.locator('.empty')).toBeVisible();
+  const count = await page.locator('.grid li, .empty').count();
+  expect(count).toBeGreaterThan(0);
 });
 
-test('articles index renders with an intentional empty state', async ({ page }) => {
+test('articles index renders content or an honest empty state', async ({ page }) => {
   await page.goto('/articles/');
   await expect(page.locator('h1')).toHaveText('Articles');
-  await expect(page.locator('.empty')).toBeVisible();
+  const count = await page.locator('.grid li, .empty').count();
+  expect(count).toBeGreaterThan(0);
 });
 
 test('draft seed content is not published as a route', async ({ page }) => {

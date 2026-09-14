@@ -16,7 +16,7 @@ const { items, emptyMessage } = Astro.props;
 {items.length === 0 ? (
   <p class="empty">{emptyMessage}</p>
 ) : (
-  <ul class="grid">
+  <ul class="grid auto-grid">
     {items.map((item) => (
       <li>
         <article>
@@ -31,12 +31,7 @@ const { items, emptyMessage } = Astro.props;
 
 <style>
   .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--s-8);
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    --auto-grid-min: 280px;
   }
   article {
     display: grid;

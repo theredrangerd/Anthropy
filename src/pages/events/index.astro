@@ -2,18 +2,21 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CollectionGrid from '../../components/CollectionGrid.astro';
-import { excludeDrafts, sortByDateDesc } from '../../lib/collections';
+import { excludeDrafts, sortByDateDesc, sortByDateAsc } from '../../lib/collections';
 import { formatEventDate } from '../../lib/format';
 
-const all = sortByDateDesc(
-  excludeDrafts(await getCollection('events')),
+const events = excludeDrafts(await getCollection('events'));
+
+const upcoming = sortByDateAsc(
+  events.filter((e) => e.data.upcoming),
+  (e) => e.data.startsAt,
+);
+const past = sortByDateDesc(
+  events.filter((e) => !e.data.upcoming),
   (e) => e.data.startsAt,
 );
 
-const upcoming = all.filter((e) => e.data.upcoming);
-const past = all.filter((e) => !e.data.upcoming);
-
-const toItem = (e: (typeof all)[number]) => ({
+const toItem = (e: (typeof events)[number]) => ({
   href: `/events/${e.id}/`,
   title: e.data.name,
   meta: formatEventDate(e.data.startsAt),
