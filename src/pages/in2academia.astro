@@ -1,40 +1,206 @@
 ---
-import ProseLayout from '../layouts/ProseLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const stats = [
+  { value: '10 weeks', label: 'a deeper dive' },
+  { value: '10 workshops', label: 'across two months' },
+  { value: '1 paper', label: 'written, start to finish' },
+];
+
+const pillars = [
+  {
+    title: 'A step-by-step course',
+    body: 'A ten-workshop curriculum, built with teachers and past students, that breaks research into stages so you always know what’s next.',
+  },
+  {
+    title: 'A dedicated mentor',
+    body: 'Tailored feedback every session from a mentor with published research of their own.',
+  },
+  {
+    title: 'Connections beyond the classroom',
+    body: 'Guest lecturers and professionals from Anthropy’s network to take your research further.',
+  },
+  {
+    title: 'A real shot at publication',
+    body: 'Strong papers are considered for the Anthropy Academic Journal and the website archive.',
+  },
+];
+
+const disciplines = ['Politics', 'Society', 'History', 'Economics', 'Culture', '& more'];
+
+const testimonials = [
+  {
+    quote: 'I have solidified practical research and analytical writing skills that I can apply in the future.',
+    name: 'Derek Shih',
+  },
+  {
+    quote: 'I will forever be grateful for this opportunity.',
+    name: 'Victoria Do',
+  },
+  {
+    quote: 'Through this program, I learned how to move from surface level summaries and engage in true critical analysis.',
+    name: 'Anahita Ghosh Singh',
+  },
+  {
+    quote: 'I particularly enjoyed the opportunity to connect with people who are passionate about their field.',
+    name: 'Simrin Khaitan',
+  },
+  {
+    quote: 'In-2-Academia truly guided me through every step from scratch.',
+    name: 'Yueqi Gou',
+  },
+];
 ---
-<ProseLayout
+<BaseLayout
   title="In2Academia"
   description="A ten-week programme teaching secondary students how to conduct humanities research and publish a paper."
-  eyebrow="Research programme"
 >
-  <p>
-    In2Academia is a ten-week programme that teaches secondary students how to do
-    humanities research properly — and then has them do it.
-  </p>
+  <section class="head">
+    <p class="eyebrow">Research programme</p>
+    <h1>In2Academia</h1>
+    <p class="lede">Explore. Research. Belong.</p>
+    <div class="prose">
+      <p>
+        In2Academia is a ten-week programme that teaches secondary students how to do
+        humanities research properly — and then has them do it.
+      </p>
+    </div>
+  </section>
 
-  <h2>How it works</h2>
-  <p>
-    Ten workshops across roughly two months take you from an area of interest to a
-    researchable question, through source work and argument construction, to a finished
-    paper. You work with academic mentors and with other students doing the same thing.
-  </p>
+  <section class="stats">
+    <ul class="auto-grid">
+      {stats.map((s) => (
+        <li>
+          <span class="value">{s.value}</span>
+          <span class="label">{s.label}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
 
-  <h2>What you come away with</h2>
-  <p>
-    A completed research paper, and the possibility of publication in the Anthropy
-    Academic Journal. More durably: you will know how to find a question worth asking,
-    how to read a source critically, and how to build an argument that survives contact
-    with someone who disagrees.
-  </p>
+  <section class="block">
+    <h2>What you get</h2>
+    <ul class="pillars auto-grid">
+      {pillars.map((p) => (
+        <li>
+          <h3>{p.title}</h3>
+          <p>{p.body}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
 
-  <h2>Disciplines</h2>
-  <p>
-    Politics, society, history, economics, culture, and whatever else you can make a
-    serious case for.
-  </p>
+  <section class="block">
+    <h2>Disciplines</h2>
+    <ul class="tags">
+      {disciplines.map((d) => (
+        <li>{d}</li>
+      ))}
+    </ul>
+  </section>
 
-  <h2>Joining</h2>
-  <p>
-    Applications open at the start of each cycle. If you want to know when the next one
-    opens, <a href="/contact/">get in touch</a> and we will let you know directly.
-  </p>
-</ProseLayout>
+  <section class="block">
+    <h2>What past students say</h2>
+    <ul class="testimonials auto-grid">
+      {testimonials.map((t) => (
+        <li>
+          <blockquote>“{t.quote}”</blockquote>
+          <p class="who">{t.name}, ’26 In2Academia participant</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>Joining</h2>
+    <div class="prose">
+      <p>
+        Applications open at the start of each cycle. If you want to know when the next one
+        opens, <a href="/contact/">get in touch</a> and we will let you know directly.
+      </p>
+    </div>
+  </section>
+
+  <section class="mentor">
+    <h2>Become a mentor</h2>
+    <div class="prose">
+      <p>
+        Anthropy is also looking for academic mentors — people with a background in
+        humanities or social sciences research and an interest in guiding student
+        researchers. Published research is preferred, not required. <a href="/contact/">Get in touch</a> if
+        that's you.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .head {
+    display: grid;
+    gap: var(--s-4);
+    padding-block: var(--s-16) var(--s-8);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-family: var(--f-prose);
+    font-size: var(--t-lg);
+    color: var(--c-ink-soft);
+  }
+  .prose { font-family: var(--f-prose); }
+
+  .stats {
+    border-block: 1px solid var(--c-rule);
+    padding-block: var(--s-8);
+  }
+  .stats ul {
+    --auto-grid-min: 200px;
+    --auto-grid-gap: var(--s-6);
+  }
+  .stats li { display: grid; gap: var(--s-1); }
+  .stats .value { font-family: var(--f-display); font-size: var(--t-lg); color: var(--c-ink); }
+  .stats .label { font-size: var(--t-sm); color: var(--c-ink-faint); }
+
+  .block { padding-block: var(--s-16); display: grid; gap: var(--s-6); }
+
+  .pillars { --auto-grid-min: 240px; }
+  .pillars li { display: grid; gap: var(--s-2); }
+  .pillars h3 { font-size: var(--t-lg); }
+  .pillars p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 40ch; }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .tags li {
+    font-family: var(--f-ui);
+    font-size: var(--t-sm);
+    color: var(--c-ink-soft);
+    border: 1px solid var(--c-rule);
+    border-radius: 999px;
+    padding: var(--s-1) var(--s-4);
+  }
+
+  .testimonials { --auto-grid-min: 260px; }
+  .testimonials li { display: grid; gap: var(--s-2); }
+  .testimonials blockquote {
+    margin: 0;
+    font-family: var(--f-prose);
+    font-style: italic;
+    color: var(--c-ink-soft);
+    padding-left: var(--s-4);
+    border-left: 1px solid var(--c-rule);
+  }
+  .testimonials .who { font-size: var(--t-xs); color: var(--c-ink-faint); }
+
+  .mentor {
+    border-top: 1px solid var(--c-rule);
+    padding-block: var(--s-8) var(--s-16);
+    display: grid;
+    gap: var(--s-4);
+  }
+  .mentor h2 { font-size: var(--t-lg); }
+</style>
