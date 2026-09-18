@@ -8,9 +8,11 @@ const years = (await getCollection('leadership')).sort(
 const current = years.find((y) => y.data.current) ?? years[0];
 const previous = years.filter((y) => y.id !== current?.id);
 
-const leads = current?.data.members.filter((m) => m.tier === 'lead') ?? [];
-const cores = current?.data.members.filter((m) => m.tier === 'core') ?? [];
-const mentors = current?.data.members.filter((m) => m.tier === 'mentor') ?? [];
+const tierGroups = [
+  { tier: 'lead', members: current?.data.members.filter((m) => m.tier === 'lead') ?? [] },
+  { tier: 'core', members: current?.data.members.filter((m) => m.tier === 'core') ?? [] },
+  { tier: 'mentor', members: current?.data.members.filter((m) => m.tier === 'mentor') ?? [] },
+];
 ---
 <BaseLayout
   title="Leadership"
@@ -42,27 +44,24 @@ const mentors = current?.data.members.filter((m) => m.tier === 'mentor') ?? [];
         <p class="empty">This year's team is being confirmed.</p>
       ) : (
         <ul class="bento">
-          {leads.map((m) => (
-            <li class="tile" data-tier="lead" data-initial={m.name.charAt(0)}>
-              <span class="role-tag">{m.role}</span>
-              <p class="name">{m.name}</p>
-              {m.bio && <p class="bio">{m.bio}</p>}
-            </li>
-          ))}
-          {cores.map((m) => (
-            <li class="tile" data-tier="core" data-initial={m.name.charAt(0)}>
-              <span class="role-tag">{m.role}</span>
-              <p class="name">{m.name}</p>
-              {m.bio && <p class="bio">{m.bio}</p>}
-            </li>
-          ))}
-          {mentors.map((m, i) => (
-            <li class="tile" data-tier="mentor" class:list={{ alt: i % 2 === 1 }} data-initial={m.name.charAt(0)}>
-              <span class="role-tag">{m.role}</span>
-              <p class="name">{m.name}</p>
-              {m.bio && <p class="bio">{m.bio}</p>}
-            </li>
-          ))}
+          {tierGroups.map(({ tier, members }) =>
+            members.map((m, i) => (
+              <li
+                class="tile"
+                data-tier={tier}
+                data-initial={m.name.charAt(0)}
+                data-has-photo={m.photo ? true : undefined}
+                class:list={{ alt: tier === 'mentor' && i % 2 === 1 }}
+              >
+                <div class="top">
+                  {m.photo && <img class="avatar" src={m.photo} alt={m.name} />}
+                  <span class="role-tag">{m.role}</span>
+                </div>
+                <p class="name">{m.name}</p>
+                {m.bio && <p class="bio">{m.bio}</p>}
+              </li>
+            )),
+          )}
         </ul>
       )}
     </section>
@@ -155,9 +154,10 @@ const mentors = current?.data.members.filter((m) => m.tier === 'mentor') ?? [];
   }
   .tile[data-tier='mentor'].alt { background: var(--c-sunk); }
 
-  /* A giant, faint initial behind the lead tiles' text — the closest thing
-     to a portrait until real photos exist. */
-  .tile[data-tier='lead']::before {
+  /* A giant, faint initial behind a lead tile's text — stands in for a
+     portrait until that person has a real photo. Suppressed once one
+     exists (data-has-photo), so this scales to any tier getting photos. */
+  .tile[data-tier='lead']:not([data-has-photo])::before {
     content: attr(data-initial);
     position: absolute;
     right: var(--s-2);
@@ -170,8 +170,28 @@ const mentors = current?.data.members.filter((m) => m.tier === 'mentor') ?? [];
     pointer-events: none;
   }
 
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .avatar {
+    display: block;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid var(--c-surface);
+    box-shadow: 0 2px 6px rgba(20, 36, 58, 0.18);
+  }
+  .tile[data-tier='lead'] .avatar { width: 5.5rem; height: 5.5rem; }
+  .tile[data-tier='core'] .avatar { width: 4.5rem; height: 4.5rem; }
+  .tile[data-tier='mentor'] .avatar { width: 3.75rem; height: 3.75rem; }
+
   .role-tag {
-    justify-self: start;
     position: relative;
     z-index: 1;
     font-family: var(--f-ui);
