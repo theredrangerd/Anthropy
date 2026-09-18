@@ -7,14 +7,14 @@ test('final text is correct without the animation having run', async ({ page }) 
   await expect(page.locator('.lede')).not.toContainText('just interested in');
 });
 
-test('the effect is contained to two placements site-wide', async ({ page }) => {
+test('the effect is contained to one placement site-wide', async ({ page }) => {
   const routes = ['/', '/journal/', '/articles/', '/events/', '/in2academia/', '/leadership/', '/about/', '/contact/'];
   let total = 0;
   for (const route of routes) {
     await page.goto(route);
     total += await page.locator('[data-revision]').count();
   }
-  expect(total).toBe(2);
+  expect(total).toBe(1);
 });
 
 test('the draft text is inserted only when motion is allowed', async ({ page }) => {
@@ -30,8 +30,13 @@ test('the draft text is inserted only when motion is allowed', async ({ page }) 
     .toBe('just interested in');
 });
 
-test('about page states what Anthropy is not', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+test('about page does not frame itself against being a think tank', async ({ page }) => {
   await page.goto('/about/');
-  await expect(page.locator('.prose')).toContainText('not a think tank');
+  const text = (await page.locator('.prose').innerText()).toLowerCase();
+  expect(text).not.toContain('think tank');
+});
+
+test('about page states its purpose as fostering early intellectual curiosity', async ({ page }) => {
+  await page.goto('/about/');
+  await expect(page.locator('.prose')).toContainText('early intellectual curiosity');
 });

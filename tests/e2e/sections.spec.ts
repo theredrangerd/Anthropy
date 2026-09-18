@@ -54,6 +54,11 @@ test('leadership page shows a real roster or an honest empty state', async ({ pa
   expect(count).toBeGreaterThan(0);
 });
 
+test('about page shows the programmes as a tile pair', async ({ page }) => {
+  await page.goto('/about/');
+  await expect(page.locator('.tile-pair-item')).toHaveCount(2);
+});
+
 test('page body never scrolls horizontally at mobile width', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 720 });
   for (const route of ROUTES) {

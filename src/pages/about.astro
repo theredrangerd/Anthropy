@@ -1,6 +1,5 @@
 ---
 import ProseLayout from '../layouts/ProseLayout.astro';
-import RevisionReveal from '../components/RevisionReveal.astro';
 import site from '../data/site.json';
 ---
 <ProseLayout
@@ -8,38 +7,87 @@ import site from '../data/site.json';
   description="Anthropy is a student-led humanities research organization based at UWC Dover."
   eyebrow={`Established ${site.established} · ${site.basedAt}`}
 >
-  <p>
-    Anthropy is a student-led organization for humanities research. We are based at UWC
-    South East Asia's Dover Campus, with a few contributors from UWC East and one
-    contributor from outside Singapore.
-  </p>
-  <p>
-    We exist because the distance between being interested in the humanities and doing
-    humanities research is larger than it should be, and almost nothing bridges it at
-    secondary school. A student who is curious about political theory or economic history
-    is usually told to wait until university. We think that is a waste of several years of
-    genuine intellectual appetite.
-  </p>
+  <div class="opening">
+    <div class="opening-text">
+      <p>
+        Anthropy is a student-led organization for humanities research. We are based at UWC
+        South East Asia's Dover Campus, with a few contributors from UWC East and one
+        contributor from outside Singapore.
+      </p>
+      <p class="lede">
+        We exist to foster early intellectual curiosity in the humanities — the years between
+        being interested in a subject and being equipped to study it properly, which secondary
+        school rarely bridges. A student curious about political theory or economic history is
+        usually told to wait until university. We think that wait is longer than it needs to be.
+      </p>
+    </div>
+    <div class="figure-slot about-figure" aria-hidden="true"></div>
+  </div>
+
+  <ul class="facts auto-grid">
+    <li><span class="value">{site.established}</span><span class="label">founded</span></li>
+    <li><span class="value">{site.basedAt}</span><span class="label">based at</span></li>
+  </ul>
 
   <h2>What we do</h2>
-  <p>
-    <strong>In2Academia</strong> is our research programme. Over ten weeks and ten
-    workshops, students move from a vague interest to a defined research question to a
-    finished paper, working alongside academic mentors. Strong papers are published in our
-    academic journal.
-  </p>
-  <p>
-    <strong>Humanities Focus</strong> is our speaker programme. We bring researchers,
-    academics, and professionals in to speak directly with students — not as a careers
-    talk, but as a conversation about what the work actually involves.
-  </p>
+  <div class="tile-pair">
+    <article class="tile-pair-item primary">
+      <h3><a href="/in2academia/">In2Academia</a></h3>
+      <p>
+        Over ten weeks and ten workshops, students move from a vague interest to a defined
+        research question to a finished paper, working alongside academic mentors. Strong
+        papers are published in our academic journal.
+      </p>
+    </article>
+    <article class="tile-pair-item secondary">
+      <h3><a href="/events/">Humanities Focus</a></h3>
+      <p>
+        We bring researchers, academics, and professionals in to speak directly with students —
+        not as a careers talk, but as a conversation about what the work actually involves.
+      </p>
+    </article>
+  </div>
 
-  <h2>What we are not</h2>
-  <p>
-    We are <RevisionReveal from="a small think tank" to="not a think tank" />, and we do not
-    claim our students' work changes fields. The point is the other direction: the students
-    who learn to do this work properly now are the ones who will change those fields later.
-    The journal exists so that work is taken seriously, and so the people who wrote it can
-    point to it.
+  <p class="closing">
+    The journal exists so that work is taken seriously, and so the people who wrote it can point
+    to it.
   </p>
 </ProseLayout>
+
+<style>
+  .opening {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: var(--s-8);
+    align-items: center;
+  }
+  .opening-text { display: grid; gap: var(--s-4); }
+  .lede { font-family: var(--f-prose); font-size: var(--t-lg); color: var(--c-ink); }
+  .about-figure { aspect-ratio: 3 / 4; }
+
+  .facts {
+    --auto-grid-min: 180px;
+    border-block: 1px solid var(--c-rule);
+    padding-block: var(--s-6);
+    margin-top: var(--s-12);
+  }
+  .facts li { display: grid; gap: var(--s-1); }
+  .facts .value { font-family: var(--f-display); font-size: var(--t-lg); color: var(--c-ink); }
+  .facts .label { font-size: var(--t-sm); color: var(--c-ink-faint); }
+
+  h2 { margin-top: var(--s-12); font-size: var(--t-xl); }
+
+  .tile-pair { margin-top: var(--s-6); }
+
+  .closing {
+    margin-top: var(--s-12);
+    font-family: var(--f-prose);
+    color: var(--c-ink-soft);
+    max-width: var(--measure);
+  }
+
+  @media (max-width: 720px) {
+    .opening { grid-template-columns: 1fr; }
+    .about-figure { display: none; }
+  }
+</style>
