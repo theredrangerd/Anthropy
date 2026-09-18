@@ -3,84 +3,113 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProofBand from '../components/ProofBand.astro';
 import CollectionGrid from '../components/CollectionGrid.astro';
+import FeaturedItem from '../components/FeaturedItem.astro';
 import RevisionReveal from '../components/RevisionReveal.astro';
 import { excludeDrafts, sortByDateDesc, sortByDateAsc } from '../lib/collections';
 import { formatIssueDate, formatEventDate } from '../lib/format';
 import site from '../data/site.json';
 
-const articles = sortByDateDesc(
+const allArticles = sortByDateDesc(
   excludeDrafts(await getCollection('articles')),
   (a) => a.data.publishedAt,
-).slice(0, 3);
+);
+const [featuredArticle, ...restArticles] = allArticles;
+const compactArticles = restArticles.slice(0, 3);
 
-const issues = sortByDateDesc(
+const allIssues = sortByDateDesc(
   excludeDrafts(await getCollection('journal')),
   (i) => i.data.publishedAt,
-).slice(0, 2);
+);
+const latestIssues = allIssues.slice(0, 2);
+const issueItems = latestIssues.map((i) => ({
+  href: `/journal/${i.id}/`,
+  title: i.data.title,
+  meta: `Issue ${i.data.issueNumber} · ${formatIssueDate(i.data.publishedAt)}`,
+  summary: i.data.summary,
+}));
 
 const upcoming = sortByDateAsc(
   excludeDrafts(await getCollection('events')).filter((e) => e.data.upcoming),
   (e) => e.data.startsAt,
 );
 
-const articleItems = articles.map((a) => ({
-  href: `/articles/${a.id}/`,
-  title: a.data.title,
-  meta: `${a.data.discipline} · ${formatIssueDate(a.data.publishedAt)}`,
-  summary: a.data.summary,
-}));
-
-const issueItems = issues.map((i) => ({
-  href: `/journal/${i.id}/`,
-  title: i.data.title,
-  meta: `Issue ${i.data.issueNumber} · ${formatIssueDate(i.data.publishedAt)}`,
-  summary: i.data.summary,
-}));
+const stats = [
+  { value: String(site.established), label: 'founded' },
+  ...(allArticles.length > 0
+    ? [{ value: String(allArticles.length), label: allArticles.length === 1 ? 'paper published' : 'papers published' }]
+    : []),
+  ...(allIssues.length > 0
+    ? [{ value: String(allIssues.length), label: allIssues.length === 1 ? 'journal issue' : 'journal issues' }]
+    : []),
+];
 ---
 <BaseLayout
   title="Anthropy"
   description="Anthropy is a student-led humanities research organization at UWC Dover. We publish student research and bring academics into conversation with the students who will follow them."
 >
   <section class="thesis">
-    <p class="eyebrow">Humanities research · UWC Dover · Est. {site.established}</p>
-    <h1>We do not set out to change the humanities. We set out to prepare the people who will.</h1>
-    <p class="lede">
-      Anthropy runs a research programme, publishes a student academic journal, and brings
-      working academics into direct conversation with secondary students. Everything here is
-      produced by students who were <RevisionReveal from="just interested in" to="learning to do" /> research
-      when they started.
-    </p>
+    <div class="thesis-text">
+      <p class="eyebrow">Humanities research · UWC Dover · Est. {site.established}</p>
+      <h1>We do not set out to change the humanities. We set out to prepare the people who will.</h1>
+      <p class="lede">
+        Anthropy runs a research programme, publishes a student academic journal, and brings
+        working academics into direct conversation with secondary students. Everything here is
+        produced by students who were <RevisionReveal from="just interested in" to="learning to do" /> research
+        when they started.
+      </p>
+    </div>
+    <div class="figure-slot hero-figure" aria-hidden="true"></div>
   </section>
 
   <ProofBand />
 
-  <section class="block">
+  <section class="block editorial">
     <h2>Recent work</h2>
-    <CollectionGrid
-      items={articleItems}
-      emptyMessage="The first papers of this cycle are being prepared for publication."
-    />
-  </section>
-
-  <section class="block">
-    <h2>The journal</h2>
-    <CollectionGrid
-      items={issueItems}
-      emptyMessage="The inaugural issue is in preparation."
-    />
+    <div class="editorial-grid">
+      <div class="editorial-main">
+        {featuredArticle ? (
+          <FeaturedItem
+            href={`/articles/${featuredArticle.id}/`}
+            eyebrow={`${featuredArticle.data.discipline} · ${formatIssueDate(featuredArticle.data.publishedAt)}`}
+            title={featuredArticle.data.title}
+            summary={featuredArticle.data.summary}
+            badge="Latest"
+          />
+        ) : (
+          <p class="empty">The first papers of this cycle are being prepared for publication.</p>
+        )}
+      </div>
+      <div class="editorial-aside">
+        {compactArticles.length > 0 && (
+          <ul class="compact-list">
+            {compactArticles.map((a) => (
+              <li>
+                <a href={`/articles/${a.id}/`}>{a.data.title}</a>
+                <span class="meta">{formatIssueDate(a.data.publishedAt)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <h3 class="aside-heading">The journal</h3>
+        <CollectionGrid
+          items={issueItems}
+          emptyMessage="The inaugural issue is in preparation."
+        />
+      </div>
+    </div>
   </section>
 
   <section class="block programmes">
     <h2>What we run</h2>
-    <div class="two auto-grid">
-      <article>
+    <div class="tile-pair">
+      <article class="tile-pair-item primary">
         <h3><a href="/in2academia/">In2Academia</a></h3>
         <p>
           A ten-week programme teaching secondary students how to actually conduct humanities
           research — from question to argument to a paper that gets published.
         </p>
       </article>
-      <article>
+      <article class="tile-pair-item secondary">
         <h3><a href="/events/">Humanities Focus</a></h3>
         <p>
           Our speaker programme brings researchers and academics in to talk directly with
@@ -92,14 +121,28 @@ const issueItems = issues.map((i) => ({
       </article>
     </div>
   </section>
+
+  <section class="block stats">
+    <ul class="auto-grid">
+      {stats.map((s) => (
+        <li>
+          <span class="value">{s.value}</span>
+          <span class="label">{s.label}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
 </BaseLayout>
 
 <style>
   .thesis {
     display: grid;
-    gap: var(--s-6);
+    grid-template-columns: 3fr 2fr;
+    align-items: center;
+    gap: var(--s-8);
     padding-block: var(--s-24) var(--s-16);
   }
+  .thesis-text { display: grid; gap: var(--s-6); }
   .thesis h1 { max-width: 18ch; }
   .lede {
     font-family: var(--f-prose);
@@ -107,15 +150,44 @@ const issueItems = issues.map((i) => ({
     color: var(--c-ink-soft);
     max-width: 52ch;
   }
-  .block {
+  .hero-figure { aspect-ratio: 4 / 5; }
+
+  .block { display: grid; gap: var(--s-6); padding-block: var(--s-16); }
+
+  .editorial-grid {
     display: grid;
-    gap: var(--s-6);
-    padding-block: var(--s-16);
+    grid-template-columns: 3fr 2fr;
+    gap: var(--s-8);
+    align-items: start;
   }
-  .two {
-    --auto-grid-min: 280px;
+  .editorial-aside { display: grid; gap: var(--s-4); }
+  .aside-heading {
+    font-family: var(--f-ui);
+    font-size: var(--t-base);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--c-ink-faint);
   }
-  .two article { display: grid; gap: var(--s-2); }
-  .two p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 46ch; }
-  .two h3 a { text-decoration: none; }
+  .compact-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); }
+  .compact-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-3);
+    border-top: 1px solid var(--c-rule);
+    padding-top: var(--s-2);
+  }
+  .compact-list a { text-decoration: none; }
+  .compact-list a:hover { text-decoration: underline; text-decoration-color: var(--c-sage); }
+  .compact-list .meta { font-size: var(--t-xs); color: var(--c-ink-faint); white-space: nowrap; }
+
+  .stats ul { --auto-grid-min: 200px; --auto-grid-gap: var(--s-6); }
+  .stats li { display: grid; gap: var(--s-1); }
+  .stats .value { font-family: var(--f-display); font-size: var(--t-lg); color: var(--c-ink); }
+  .stats .label { font-size: var(--t-sm); color: var(--c-ink-faint); }
+
+  @media (max-width: 720px) {
+    .thesis { grid-template-columns: 1fr; }
+    .hero-figure { display: none; }
+    .editorial-grid { grid-template-columns: 1fr; }
+  }
 </style>
