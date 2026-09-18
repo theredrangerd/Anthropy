@@ -45,33 +45,29 @@ const tierGroups = [
       ) : (
         <ul class="bento">
           {tierGroups.map(({ tier, members }) =>
-            members.map((m, i) => {
-              // Typing speed for the reveal below: ~20 chars/sec for the role
-              // tag, ~55/sec for the longer bio, each with a sane floor so
-              // even a short string visibly types rather than blinking in.
-              const roleDur = Math.max(m.role.length / 20, 0.3).toFixed(2);
-              const bioDur = Math.max((m.bio?.length ?? 0) / 55, 0.6).toFixed(2);
-              return (
-                <li
-                  class="tile"
-                  data-tier={tier}
-                  tabindex="0"
-                  style={`--role-dur: ${roleDur}s; --bio-dur: ${bioDur}s; --chars: ${m.role.length}`}
-                  class:list={{ alt: tier === 'mentor' && i % 2 === 1 }}
-                >
-                  <div class="portrait">
-                    {m.photo ? (
-                      <img class="avatar" src={m.photo} alt={m.name} style={`object-position: ${m.photoPosition}`} />
-                    ) : (
-                      <span class="avatar placeholder" aria-hidden="true">{m.name.charAt(0)}</span>
-                    )}
+            members.map((m, i) => (
+              <li
+                class="tile"
+                data-tier={tier}
+                tabindex="0"
+                class:list={{ alt: tier === 'mentor' && i % 2 === 1 }}
+              >
+                <div class="portrait">
+                  {m.photo ? (
+                    <img class="avatar" src={m.photo} alt={m.name} style={`object-position: ${m.photoPosition}`} />
+                  ) : (
+                    <span class="avatar placeholder" aria-hidden="true">{m.name.charAt(0)}</span>
+                  )}
+                </div>
+                <span class="role-tag">{m.role}</span>
+                <p class="name">{m.name}</p>
+                {m.bio && (
+                  <div class="bio-wrap">
+                    <p class="bio">{m.bio}</p>
                   </div>
-                  <span class="role-tag">{m.role}</span>
-                  <p class="name">{m.name}</p>
-                  {m.bio && <p class="bio">{m.bio}</p>}
-                </li>
-              );
-            }),
+                )}
+              </li>
+            )),
           )}
         </ul>
       )}
@@ -99,15 +95,43 @@ const tierGroups = [
 </BaseLayout>
 
 <script>
-  // Progressive enhancement: the role tag and bio are real text in the DOM
-  // from the start (readable without JS, by search engines, and by anything
-  // that ignores hover). With JS, CSS hides them until the first hover or
-  // keyboard focus, then a class permanently reveals that one tile — the
-  // typewriter-style transition itself lives entirely in CSS, timed by the
-  // --role-dur/--bio-dur custom properties set per tile.
+  // Progressive enhancement: the bio is real text in the DOM from the
+  // start — readable without JS, by search engines, and by anyone with
+  // prefers-reduced-motion on. Only when JS runs *and* motion is fine do
+  // we clear it and retype it character-by-character on first hover or
+  // keyboard focus, while a `.revealed` class (added at the same moment)
+  // drives the tile's box-grow transition in CSS.
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const CHARS_PER_SECOND = 45;
+
   const tiles = document.querySelectorAll<HTMLElement>('.tile');
   for (const tile of tiles) {
-    const reveal = () => tile.classList.add('revealed');
+    const bio = tile.querySelector<HTMLElement>('.bio');
+    if (!bio || reducedMotion) continue;
+
+    const text = bio.textContent ?? '';
+    bio.textContent = '';
+    const caret = document.createElement('span');
+    caret.className = 'caret';
+    bio.after(caret);
+
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      tile.classList.add('revealed');
+      let i = 0;
+      const step = () => {
+        bio.textContent = text.slice(0, i);
+        i++;
+        if (i <= text.length) {
+          setTimeout(step, 1000 / CHARS_PER_SECOND);
+        } else {
+          caret.remove();
+        }
+      };
+      step();
+    };
     tile.addEventListener('mouseenter', reveal, { once: true });
     tile.addEventListener('focusin', reveal, { once: true });
   }
@@ -161,23 +185,22 @@ const tierGroups = [
     border-radius: 6px;
   }
 
+  /* No min-height: each tile starts sized to just its photo, role tag,
+     and name, then grows as the bio-wrap below expands on reveal. */
   .tile[data-tier='lead'] {
     grid-column: span 3;
     padding: var(--s-8);
     background: var(--c-sage-soft);
-    min-height: 15rem;
   }
   .tile[data-tier='core'] {
     grid-column: span 3;
     padding: var(--s-6);
     background: var(--c-rust-soft);
-    min-height: 10rem;
   }
   .tile[data-tier='mentor'] {
     grid-column: span 2;
     padding: var(--s-4);
     background: var(--c-surface);
-    min-height: 8rem;
   }
   .tile[data-tier='mentor'].alt { background: var(--c-sunk); }
 
@@ -201,68 +224,62 @@ const tierGroups = [
   .tile[data-tier='core'] .avatar { width: 7rem; height: 7rem; font-size: var(--t-xl); }
   .tile[data-tier='mentor'] .avatar { width: 5.5rem; height: 5.5rem; font-size: var(--t-lg); }
 
-  /* Hidden until revealed: box-sizing:border-box makes max-width:0 truly
-     zero-size (no residual border/padding "pill" ghost), so an unrevealed
-     tile shows only the photo and name. Revealing is permanent — a class
-     added once by script on first hover/focus — and the type-in itself is
-     timed entirely by CSS via the --role-dur/--bio-dur/--chars custom
-     properties set per tile. */
+  /* Role tag is always visible, never animated — only the bio types in. */
   .role-tag {
     font-family: var(--f-ui);
     font-size: var(--t-xs);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--c-ink-soft);
-    border-style: solid;
+    border: 1px solid var(--c-rule);
     border-radius: 999px;
+    padding: var(--s-1) var(--s-3);
     background: var(--c-ground);
-    box-sizing: border-box;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 0;
-    padding: 0;
-    border-width: 0;
-    transition:
-      max-width var(--role-dur, 0.3s) steps(var(--chars, 10)),
-      padding 0.01s var(--role-dur, 0.3s),
-      border-width 0.01s var(--role-dur, 0.3s);
   }
   .tile[data-tier='lead'] .role-tag { transform: rotate(-2deg); }
-  .tile.revealed .role-tag {
-    max-width: 24ch;
-    padding: var(--s-1) var(--s-3);
-    border-width: 1px;
-    border-color: var(--c-rule);
-    transition:
-      max-width var(--role-dur, 0.3s) steps(var(--chars, 10)),
-      padding 0.01s,
-      border-width 0.01s;
-  }
 
   .tile .name { font-family: var(--f-display); }
   .tile[data-tier='lead'] .name { font-size: var(--t-xl); }
   .tile[data-tier='core'] .name { font-size: var(--t-lg); }
   .tile[data-tier='mentor'] .name { font-size: var(--t-base); }
 
-  .tile .bio {
+  /* Collapsed to zero height until revealed — the grid-template-rows
+     0fr → 1fr trick, so the tile visibly grows to fit the bio as it types
+     in rather than snapping straight to its final size. */
+  .bio-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s ease;
+  }
+  .tile.revealed .bio-wrap { grid-template-rows: 1fr; }
+  .bio {
+    overflow: hidden;
     font-family: var(--f-prose);
     color: var(--c-ink-soft);
     max-width: 42ch;
-    clip-path: inset(0 100% 0 0);
-    transition: clip-path var(--bio-dur, 0.6s) linear;
   }
   .tile[data-tier='mentor'] .bio { font-size: var(--t-sm); }
-  .tile.revealed .bio {
-    clip-path: inset(0 0 0 0);
-    transition: clip-path var(--bio-dur, 0.6s) linear var(--role-dur, 0.3s);
-  }
 
-  /* The global reduced-motion rule (global.css) zeroes durations but not
-     delays, so without this the bio would still wait out --role-dur before
-     snapping into view. Zero the delay too, so reduced-motion users get
-     everything at once. */
+  /* Blinking caret shown only while a bio is actively being typed —
+     appended after .bio by script, removed once typing finishes. */
+  .caret {
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    margin-left: 2px;
+    background: currentColor;
+    color: var(--c-ink-soft);
+    vertical-align: -0.15em;
+    animation: caret-blink 0.8s steps(1) infinite;
+  }
+  @keyframes caret-blink { 50% { opacity: 0; } }
+
+  /* The script deliberately skips wiring up any tile when motion is
+     reduced (nothing to animate), which means it never adds the
+     `.revealed` class either. Without this, a collapsed bio-wrap would
+     stay collapsed forever, unreachable by hover or focus. */
   @media (prefers-reduced-motion: reduce) {
-    .tile.revealed .bio { transition-delay: 0s; }
+    .bio-wrap { grid-template-rows: 1fr; }
   }
 
   @media (max-width: 720px) {
