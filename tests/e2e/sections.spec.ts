@@ -33,6 +33,12 @@ test('events page explains the week-to-forum change rather than implying inconsi
   await expect(page.locator('.lede')).toContainText('single-day forum');
 });
 
+test('events "Next" section, when present, uses the featured treatment', async ({ page }) => {
+  await page.goto('/events/');
+  const featuredCount = await page.locator('.featured-item').count();
+  expect(featuredCount).toBeLessThanOrEqual(1);
+});
+
 test('no page describes Anthropy as multi-campus', async ({ page }) => {
   for (const route of ROUTES) {
     await page.goto(route);
