@@ -18,6 +18,9 @@ const { from, to } = Astro.props;
     text-decoration-thickness: 2px;
     margin-right: 0.3em;
     display: none;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
   }
   /* inline-block, not inline: the strike keyframe animates max-width,
      which has no effect on a non-replaced inline element. */
