@@ -36,6 +36,6 @@ test('programmes are shown as a featured tile pair', async ({ page }) => {
 
 test('homepage closes with a stat strip that never shows a bare zero', async ({ page }) => {
   await page.goto('/');
-  const values = await page.locator('.stats .value').allTextContents();
+  const values = await page.locator('.fact-strip .value').allTextContents();
   for (const v of values) expect(v.trim()).not.toBe('0');
 });

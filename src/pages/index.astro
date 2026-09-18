@@ -122,8 +122,8 @@ const stats = [
     </div>
   </section>
 
-  <section class="block stats">
-    <ul class="auto-grid">
+  <section class="fact-strip">
+    <ul>
       {stats.map((s) => (
         <li>
           <span class="value">{s.value}</span>
@@ -179,11 +179,6 @@ const stats = [
   .compact-list a { text-decoration: none; }
   .compact-list a:hover { text-decoration: underline; text-decoration-color: var(--c-sage); }
   .compact-list .meta { font-size: var(--t-xs); color: var(--c-ink-faint); white-space: nowrap; }
-
-  .stats ul { --auto-grid-min: 200px; --auto-grid-gap: var(--s-6); }
-  .stats li { display: grid; gap: var(--s-1); }
-  .stats .value { font-family: var(--f-display); font-size: var(--t-lg); color: var(--c-ink); }
-  .stats .label { font-size: var(--t-sm); color: var(--c-ink-faint); }
 
   @media (max-width: 720px) {
     .thesis { grid-template-columns: 1fr; }

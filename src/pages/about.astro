@@ -1,14 +1,18 @@
 ---
-import ProseLayout from '../layouts/ProseLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import site from '../data/site.json';
 ---
-<ProseLayout
+<BaseLayout
   title="About Anthropy"
   description="Anthropy is a student-led humanities research organization based at UWC Dover."
-  eyebrow={`Established ${site.established} · ${site.basedAt}`}
 >
+  <section class="head">
+    <p class="eyebrow">Established {site.established} · {site.basedAt}</p>
+    <h1>About Anthropy</h1>
+  </section>
+
   <div class="opening">
-    <div class="opening-text">
+    <div class="opening-text prose">
       <p>
         Anthropy is a student-led organization for humanities research. We are based at UWC
         South East Asia's Dover Campus, with a few contributors from UWC East and one
@@ -24,67 +28,50 @@ import site from '../data/site.json';
     <div class="figure-slot about-figure" aria-hidden="true"></div>
   </div>
 
-  <ul class="facts auto-grid">
-    <li><span class="value">{site.established}</span><span class="label">founded</span></li>
-    <li><span class="value">{site.basedAt}</span><span class="label">based at</span></li>
-  </ul>
+  <section class="fact-strip">
+    <ul>
+      <li><span class="value">{site.established}</span><span class="label">founded</span></li>
+      <li><span class="value">{site.basedAt}</span><span class="label">based at</span></li>
+    </ul>
+  </section>
 
-  <h2>What we do</h2>
-  <div class="tile-pair">
-    <article class="tile-pair-item primary">
-      <h3><a href="/in2academia/">In2Academia</a></h3>
-      <p>
-        Over ten weeks and ten workshops, students move from a vague interest to a defined
-        research question to a finished paper, working alongside academic mentors. Strong
-        papers are published in our academic journal.
-      </p>
-    </article>
-    <article class="tile-pair-item secondary">
-      <h3><a href="/events/">Humanities Focus</a></h3>
-      <p>
-        We bring researchers, academics, and professionals in to speak directly with students —
-        not as a careers talk, but as a conversation about what the work actually involves.
-      </p>
-    </article>
-  </div>
-
-  <p class="closing">
-    The journal exists so that work is taken seriously, and so the people who wrote it can point
-    to it.
-  </p>
-</ProseLayout>
+  <section class="block">
+    <h2>What we do</h2>
+    <div class="tile-pair">
+      <article class="tile-pair-item primary">
+        <h3><a href="/in2academia/">In2Academia</a></h3>
+        <p>
+          Over ten weeks and ten workshops, students move from a vague interest to a defined
+          research question to a finished paper, working alongside academic mentors. Strong
+          papers are published in our academic journal.
+        </p>
+      </article>
+      <article class="tile-pair-item secondary">
+        <h3><a href="/events/">Humanities Focus</a></h3>
+        <p>
+          We bring researchers, academics, and professionals in to speak directly with students —
+          not as a careers talk, but as a conversation about what the work actually involves.
+        </p>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
 
 <style>
+  .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
+
   .opening {
     display: grid;
     grid-template-columns: 3fr 2fr;
     gap: var(--s-8);
     align-items: center;
+    padding-block: var(--s-8) var(--s-16);
   }
   .opening-text { display: grid; gap: var(--s-4); }
-  .lede { font-family: var(--f-prose); font-size: var(--t-lg); color: var(--c-ink); }
+  .lede { font-size: var(--t-lg); color: var(--c-ink); }
   .about-figure { aspect-ratio: 3 / 4; }
 
-  .facts {
-    --auto-grid-min: 180px;
-    border-block: 1px solid var(--c-rule);
-    padding-block: var(--s-6);
-    margin-top: var(--s-12);
-  }
-  .facts li { display: grid; gap: var(--s-1); }
-  .facts .value { font-family: var(--f-display); font-size: var(--t-lg); color: var(--c-ink); }
-  .facts .label { font-size: var(--t-sm); color: var(--c-ink-faint); }
-
-  h2 { margin-top: var(--s-12); font-size: var(--t-xl); }
-
-  .tile-pair { margin-top: var(--s-6); }
-
-  .closing {
-    margin-top: var(--s-12);
-    font-family: var(--f-prose);
-    color: var(--c-ink-soft);
-    max-width: var(--measure);
-  }
+  .block { display: grid; gap: var(--s-6); padding-block: var(--s-16); }
 
   @media (max-width: 720px) {
     .opening { grid-template-columns: 1fr; }

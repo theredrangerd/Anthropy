@@ -118,6 +118,35 @@ img { max-width: 100%; height: auto; display: block; }
   background: linear-gradient(155deg, var(--c-sage-soft), var(--c-rust-soft));
 }
 
+/* A framed strip of value/label pairs (Home's closing stats, About's fact
+   row). The border-block frame gives it presence as a deliberate element
+   even when only one fact is available — it never reads as an
+   accidentally-empty row, regardless of item count. */
+.fact-strip {
+  border-block: 1px solid var(--c-rule);
+  padding-block: var(--s-8);
+}
+.fact-strip ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-12);
+}
+.fact-strip li {
+  display: grid;
+  gap: var(--s-1);
+}
+.fact-strip .value { font-family: var(--f-display); font-size: var(--t-2xl); color: var(--c-ink); }
+.fact-strip .label {
+  font-family: var(--f-ui);
+  font-size: var(--t-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c-ink-faint);
+}
+
 @media (max-width: 720px) {
   .tile-pair { grid-template-columns: 1fr; }
 }
