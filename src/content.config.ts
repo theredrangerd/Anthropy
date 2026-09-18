@@ -52,6 +52,11 @@ const leadership = defineCollection({
       z.object({
         name: z.string(),
         role: z.string(),
+        /** Display weight for the current-year bento grid: 'lead' (largest
+         *  tiles, e.g. co-chairs), 'core' (medium, e.g. team heads), or
+         *  'mentor' (smaller, uniform tiles). Unused for past years, which
+         *  render as a plain grid regardless of tier. */
+        tier: z.enum(['lead', 'core', 'mentor']).default('core'),
         campus: z.string().default('UWC Dover'),
         bio: z.string().optional(),
         photo: z.string().optional(),

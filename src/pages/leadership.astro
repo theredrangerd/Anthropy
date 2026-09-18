@@ -7,6 +7,10 @@ const years = (await getCollection('leadership')).sort(
 );
 const current = years.find((y) => y.data.current) ?? years[0];
 const previous = years.filter((y) => y.id !== current?.id);
+
+const leads = current?.data.members.filter((m) => m.tier === 'lead') ?? [];
+const cores = current?.data.members.filter((m) => m.tier === 'core') ?? [];
+const mentors = current?.data.members.filter((m) => m.tier === 'mentor') ?? [];
 ---
 <BaseLayout
   title="Leadership"
@@ -37,12 +41,25 @@ const previous = years.filter((y) => y.id !== current?.id);
       {current.data.members.length === 0 ? (
         <p class="empty">This year's team is being confirmed.</p>
       ) : (
-        <ul class="people auto-grid">
-          {current.data.members.map((m) => (
-            <li>
+        <ul class="bento">
+          {leads.map((m) => (
+            <li class="tile" data-tier="lead" data-initial={m.name.charAt(0)}>
+              <span class="role-tag">{m.role}</span>
               <p class="name">{m.name}</p>
-              <p class="role">{m.role}</p>
-              <p class="campus">{m.campus}</p>
+              {m.bio && <p class="bio">{m.bio}</p>}
+            </li>
+          ))}
+          {cores.map((m) => (
+            <li class="tile" data-tier="core" data-initial={m.name.charAt(0)}>
+              <span class="role-tag">{m.role}</span>
+              <p class="name">{m.name}</p>
+              {m.bio && <p class="bio">{m.bio}</p>}
+            </li>
+          ))}
+          {mentors.map((m, i) => (
+            <li class="tile" data-tier="mentor" class:list={{ alt: i % 2 === 1 }} data-initial={m.name.charAt(0)}>
+              <span class="role-tag">{m.role}</span>
+              <p class="name">{m.name}</p>
               {m.bio && <p class="bio">{m.bio}</p>}
             </li>
           ))}
@@ -83,13 +100,106 @@ const previous = years.filter((y) => y.id !== current?.id);
     font-size: var(--t-sm);
   }
   .year { padding-block: var(--s-8); border-top: 1px solid var(--c-rule); display: grid; gap: var(--s-6); }
+
+  /* Past years: plain uniform grid. */
   .people {
     --auto-grid-min: 220px;
   }
   .people li { display: grid; gap: var(--s-1); }
-  .name { font-family: var(--f-display); font-size: var(--t-lg); }
-  .role { font-size: var(--t-sm); color: var(--c-sage); }
-  .campus { font-size: var(--t-xs); color: var(--c-ink-faint); }
-  .bio { font-family: var(--f-prose); color: var(--c-ink-soft); margin-top: var(--s-2); }
+  .people .name { font-family: var(--f-display); font-size: var(--t-lg); }
+  .people .role { font-size: var(--t-sm); color: var(--c-sage); }
+  .people .campus { font-size: var(--t-xs); color: var(--c-ink-faint); }
   .empty { font-family: var(--f-prose); font-style: italic; color: var(--c-ink-faint); }
+
+  /* Current year: bento grid. Six columns; tile size (via column span and
+     padding/type scale) reflects tier, not document order. Auto-placement
+     relies on tiles being rendered grouped by tier: two leads (span 3 each,
+     one row), two core (span 3 each, one row), three mentors (span 2 each,
+     one row). */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--s-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .tile {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+    border: 1px solid var(--c-rule);
+    border-radius: 6px;
+  }
+  .tile .bio { position: relative; z-index: 1; }
+
+  .tile[data-tier='lead'] {
+    grid-column: span 3;
+    padding: var(--s-8);
+    background: var(--c-sage-soft);
+    min-height: 15rem;
+  }
+  .tile[data-tier='core'] {
+    grid-column: span 3;
+    padding: var(--s-6);
+    background: var(--c-rust-soft);
+    min-height: 10rem;
+  }
+  .tile[data-tier='mentor'] {
+    grid-column: span 2;
+    padding: var(--s-4);
+    background: var(--c-surface);
+    min-height: 8rem;
+  }
+  .tile[data-tier='mentor'].alt { background: var(--c-sunk); }
+
+  /* A giant, faint initial behind the lead tiles' text — the closest thing
+     to a portrait until real photos exist. */
+  .tile[data-tier='lead']::before {
+    content: attr(data-initial);
+    position: absolute;
+    right: var(--s-2);
+    bottom: -0.5rem;
+    font-family: var(--f-display);
+    font-size: 8rem;
+    line-height: 1;
+    color: var(--c-ink);
+    opacity: 0.07;
+    pointer-events: none;
+  }
+
+  .role-tag {
+    justify-self: start;
+    position: relative;
+    z-index: 1;
+    font-family: var(--f-ui);
+    font-size: var(--t-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-ink-soft);
+    border: 1px solid var(--c-rule);
+    border-radius: 999px;
+    padding: var(--s-1) var(--s-3);
+    background: var(--c-ground);
+  }
+  .tile[data-tier='lead'] .role-tag { transform: rotate(-2deg); }
+
+  .tile .name { font-family: var(--f-display); position: relative; z-index: 1; }
+  .tile[data-tier='lead'] .name { font-size: var(--t-xl); }
+  .tile[data-tier='core'] .name { font-size: var(--t-lg); }
+  .tile[data-tier='mentor'] .name { font-size: var(--t-base); }
+
+  .tile .bio { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 42ch; }
+  .tile[data-tier='mentor'] .bio { font-size: var(--t-sm); }
+
+  @media (max-width: 720px) {
+    .bento { grid-template-columns: 1fr; }
+    .tile[data-tier='lead'],
+    .tile[data-tier='core'],
+    .tile[data-tier='mentor'] {
+      grid-column: 1 / -1;
+    }
+  }
 </style>

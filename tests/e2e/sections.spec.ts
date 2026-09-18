@@ -44,7 +44,7 @@ test('no page describes Anthropy as multi-campus', async ({ page }) => {
 
 test('leadership page shows a real roster or an honest empty state', async ({ page }) => {
   await page.goto('/leadership/');
-  const count = await page.locator('.people li, .empty').count();
+  const count = await page.locator('.people li, .bento .tile, .empty').count();
   expect(count).toBeGreaterThan(0);
 });
 
