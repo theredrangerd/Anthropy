@@ -14,6 +14,12 @@ test('articles index renders content or an honest empty state', async ({ page })
   expect(count).toBeGreaterThan(0);
 });
 
+test('articles index features the latest paper or an honest empty state', async ({ page }) => {
+  await page.goto('/articles/');
+  const count = await page.locator('.featured-item, .empty').count();
+  expect(count).toBeGreaterThan(0);
+});
+
 test('draft seed content is not published as a route', async ({ page }) => {
   const response = await page.goto('/articles/example-article/');
   expect(response?.status()).toBe(404);
