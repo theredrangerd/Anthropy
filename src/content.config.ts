@@ -60,6 +60,10 @@ const leadership = defineCollection({
         campus: z.string().default('UWC Dover'),
         bio: z.string().optional(),
         photo: z.string().optional(),
+        /** CSS object-position for `photo`, e.g. "50% 20%" — lets a tall or
+         *  off-center source photo still land with the face centered once
+         *  cropped into a circle. Defaults to centered. */
+        photoPosition: z.string().default('50% 50%'),
       }),
     ).default([]),
   }),
