@@ -88,3 +88,36 @@ img { max-width: 100%; height: auto; display: block; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Shared layout primitives: reused by Home and About for the two-tile
+   programme pairs and the placeholder image slots ahead of real photography. */
+.tile-pair {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--s-6);
+  align-items: stretch;
+}
+.tile-pair-item {
+  display: grid;
+  align-content: start;
+  gap: var(--s-2);
+  border: 1px solid var(--c-rule);
+  border-radius: 6px;
+  padding: var(--s-6);
+}
+.tile-pair-item.primary { background: var(--c-sage-soft); padding: var(--s-8); }
+.tile-pair-item.secondary { background: var(--c-rust-soft); }
+.tile-pair-item h3 { font-size: var(--t-lg); }
+.tile-pair-item h3 a { text-decoration: none; }
+.tile-pair-item h3 a:hover { text-decoration: underline; text-decoration-color: var(--c-sage); }
+.tile-pair-item p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 46ch; }
+
+.figure-slot {
+  border-radius: 10px;
+  border: 1px solid var(--c-rule);
+  background: linear-gradient(155deg, var(--c-sage-soft), var(--c-rust-soft));
+}
+
+@media (max-width: 720px) {
+  .tile-pair { grid-template-columns: 1fr; }
+}
