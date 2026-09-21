@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Timeline from '../components/Timeline.astro';
 import site from '../data/site.json';
 ---
 <BaseLayout
@@ -7,7 +8,7 @@ import site from '../data/site.json';
   description="Anthropy is a student-led humanities research organization based at UWC Dover."
 >
   <section class="head">
-    <p class="eyebrow">Established {site.established} · {site.basedAt}</p>
+    <p class="eyebrow">Since {site.established} · {site.basedAt}</p>
     <h1>About Anthropy</h1>
   </section>
 
@@ -30,9 +31,13 @@ import site from '../data/site.json';
 
   <section class="fact-strip">
     <ul>
-      <li><span class="value">{site.established}</span><span class="label">founded</span></li>
       <li><span class="value">{site.basedAt}</span><span class="label">based at</span></li>
     </ul>
+  </section>
+
+  <section class="block" id="timeline">
+    <h2>Our story so far</h2>
+    <Timeline variant="full" />
   </section>
 
   <section class="block">

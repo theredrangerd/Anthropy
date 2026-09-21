@@ -5,3 +5,6 @@ test-results/
 playwright-report/
 .DS_Store
 .superpowers/
+
+.impeccable/
+.playwright-mcp/

@@ -3,9 +3,9 @@
   "established": 2021,
   "tagline": "Fostering early intellectual curiosity and meaningful engagement within the humanities.",
   "basedAt": "UWC South East Asia, Dover Campus",
-  "contactEmail": "REPLACE_WITH_REAL_EMAIL",
+  "contactEmail": "anthropy@gapps.uwcsea.edu.sg",
   "socials": [
     { "label": "LinkedIn", "url": "REPLACE_WITH_REAL_URL" },
-    { "label": "Instagram", "url": "REPLACE_WITH_REAL_URL" }
+    { "label": "Instagram", "url": "https://www.instagram.com/anthropy.uwc/" }
   ]
 }

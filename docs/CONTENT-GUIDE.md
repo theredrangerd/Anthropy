@@ -25,6 +25,7 @@ valuable thing on the site and the easiest to discredit.
 |---|---|
 | Organization name, tagline, contact email, social links | `src/data/site.json` |
 | Alumni outcomes shown on the homepage | `src/data/alumni.json` |
+| Timeline of key events (Home, About, footer) | `src/data/timeline.json` |
 | Journal issues | files in `src/content/journal/` |
 | Articles and papers | files in `src/content/articles/` |
 | Events (Humanities Focus) | files in `src/content/events/` |
@@ -138,6 +139,19 @@ Edit `src/data/alumni.json`. Only add people who have agreed to be listed:
 
 If the list is empty, the section simply does not appear. That is intentional and
 is better than listing anyone you are unsure about.
+
+## Adding a timeline event
+
+Edit `src/data/timeline.json`. Each entry needs a `year` (used for sorting),
+a `dateLabel` (what's actually displayed — can be a year, a year range, or a
+specific month), a `title`, and a `description`:
+
+```json
+{ "year": 2026, "dateLabel": "June 2026", "title": "A short headline", "description": "One or two sentences of context." }
+```
+
+Events render oldest to newest. The homepage and footer only show the most
+recent few; the About page shows all of them.
 
 ## Publishing your changes
 

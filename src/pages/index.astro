@@ -5,6 +5,7 @@ import ProofBand from '../components/ProofBand.astro';
 import CollectionGrid from '../components/CollectionGrid.astro';
 import FeaturedItem from '../components/FeaturedItem.astro';
 import RevisionReveal from '../components/RevisionReveal.astro';
+import Timeline from '../components/Timeline.astro';
 import { excludeDrafts, sortByDateDesc, sortByDateAsc } from '../lib/collections';
 import { formatIssueDate, formatEventDate } from '../lib/format';
 import site from '../data/site.json';
@@ -34,7 +35,6 @@ const upcoming = sortByDateAsc(
 );
 
 const stats = [
-  { value: String(site.established), label: 'founded' },
   ...(allArticles.length > 0
     ? [{ value: String(allArticles.length), label: allArticles.length === 1 ? 'paper published' : 'papers published' }]
     : []),
@@ -48,17 +48,14 @@ const stats = [
   description="Anthropy is a student-led humanities research organization at UWC Dover. We publish student research and bring academics into conversation with the students who will follow them."
 >
   <section class="thesis">
-    <div class="thesis-text">
-      <p class="eyebrow">Humanities research · UWC Dover · Est. {site.established}</p>
-      <h1>We do not set out to change the humanities. We set out to prepare the people who will.</h1>
-      <p class="lede">
-        Anthropy runs a research programme, publishes a student academic journal, and brings
-        working academics into direct conversation with secondary students. Everything here is
-        produced by students who were <RevisionReveal from="just interested in" to="learning to do" /> research
-        when they started.
-      </p>
-    </div>
-    <div class="figure-slot hero-figure" aria-hidden="true"></div>
+    <p class="eyebrow">Humanities research · UWC Dover · Since {site.established}</p>
+    <h1>We do not set out to change the humanities. We set out to prepare the people who will.</h1>
+    <p class="lede">
+      Anthropy runs a research programme, publishes a student academic journal, and brings
+      working academics into direct conversation with secondary students. Everything here is
+      produced by students who were <RevisionReveal from="just interested in" to="learning to do" /> research
+      when they started.
+    </p>
   </section>
 
   <ProofBand />
@@ -110,7 +107,7 @@ const stats = [
         </p>
       </article>
       <article class="tile-pair-item secondary">
-        <h3><a href="/events/">Humanities Focus</a></h3>
+        <h3><a href="/events/">Events</a></h3>
         <p>
           Our speaker programme brings researchers and academics in to talk directly with
           students.
@@ -122,27 +119,32 @@ const stats = [
     </div>
   </section>
 
-  <section class="fact-strip">
-    <ul>
-      {stats.map((s) => (
-        <li>
-          <span class="value">{s.value}</span>
-          <span class="label">{s.label}</span>
-        </li>
-      ))}
-    </ul>
+  <section class="block timeline-section">
+    <h2>Our story so far</h2>
+    <Timeline variant="compact" />
   </section>
+
+  {stats.length > 0 && (
+    <section class="fact-strip">
+      <ul>
+        {stats.map((s) => (
+          <li>
+            <span class="value">{s.value}</span>
+            <span class="label">{s.label}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
 </BaseLayout>
 
 <style>
   .thesis {
     display: grid;
-    grid-template-columns: 3fr 2fr;
-    align-items: center;
-    gap: var(--s-8);
+    gap: var(--s-6);
+    max-width: 640px;
     padding-block: var(--s-24) var(--s-16);
   }
-  .thesis-text { display: grid; gap: var(--s-6); }
   .thesis h1 { max-width: 18ch; }
   .lede {
     font-family: var(--f-prose);
@@ -150,7 +152,6 @@ const stats = [
     color: var(--c-ink-soft);
     max-width: 52ch;
   }
-  .hero-figure { aspect-ratio: 4 / 5; }
 
   .block { display: grid; gap: var(--s-6); padding-block: var(--s-16); }
 
@@ -181,8 +182,6 @@ const stats = [
   .compact-list .meta { font-size: var(--t-xs); color: var(--c-ink-faint); white-space: nowrap; }
 
   @media (max-width: 720px) {
-    .thesis { grid-template-columns: 1fr; }
-    .hero-figure { display: none; }
     .editorial-grid { grid-template-columns: 1fr; }
   }
 </style>

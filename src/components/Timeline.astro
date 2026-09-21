@@ -1,0 +1,143 @@
+---
+import timeline from '../data/timeline.json';
+
+interface Event {
+  year: number;
+  dateLabel: string;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  /** 'compact' is a horizontal strip of highlight beats (Home). 'full' is
+   *  the complete vertical timeline (About). */
+  variant?: 'compact' | 'full';
+  /** compact only: how many of the most significant events to show. */
+  limit?: number;
+  /** compact only: link target for "the full story". */
+  moreHref?: string;
+}
+
+const { variant = 'full', limit = 4, moreHref = '/about/#timeline' } = Astro.props;
+
+const events = (timeline.events as Event[]).slice().sort((a, b) => a.year - b.year);
+const shown = variant === 'compact' ? events.slice(-limit) : events;
+---
+{variant === 'compact' ? (
+  <div class="timeline-compact">
+    <ol>
+      {shown.map((e) => (
+        <li>
+          <span class="date">{e.dateLabel}</span>
+          <span class="title">{e.title}</span>
+        </li>
+      ))}
+    </ol>
+    {moreHref && <a class="more" href={moreHref}>The full story →</a>}
+  </div>
+) : (
+  <ol class="timeline-full">
+    {shown.map((e) => (
+      <li>
+        <span class="date">{e.dateLabel}</span>
+        <div class="body">
+          <p class="title">{e.title}</p>
+          <p class="description">{e.description}</p>
+        </div>
+      </li>
+    ))}
+  </ol>
+)}
+
+<style>
+  /* Compact: a horizontal strip of dated beats, read left to right in
+     chronological order, ending in a link to the full timeline. */
+  .timeline-compact {
+    display: grid;
+    gap: var(--s-4);
+  }
+  .timeline-compact ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: var(--s-6);
+  }
+  .timeline-compact li {
+    display: grid;
+    gap: var(--s-1);
+    padding-top: var(--s-3);
+    border-top: 2px solid var(--c-sage);
+  }
+  .timeline-compact .date {
+    font-family: var(--f-ui);
+    font-size: var(--t-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-ink-faint);
+  }
+  .timeline-compact .title {
+    font-family: var(--f-display);
+    font-size: var(--t-base);
+    color: var(--c-ink);
+  }
+  .timeline-compact .more {
+    justify-self: start;
+    font-family: var(--f-ui);
+    font-size: var(--t-sm);
+    text-decoration: none;
+  }
+  .timeline-compact .more:hover { text-decoration: underline; text-decoration-color: var(--c-sage); }
+
+  /* Full: a vertical rule with each event's date to the left and its story
+     to the right — the About page's answer to "when did this happen". */
+  .timeline-full {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-8);
+    border-left: 2px solid var(--c-rule);
+  }
+  .timeline-full li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 11ch 1fr;
+    gap: var(--s-6);
+    padding-left: var(--s-8);
+  }
+  .timeline-full li::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 0.4em;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--c-sage);
+    border: 2px solid var(--c-ground);
+  }
+  .timeline-full .date {
+    font-family: var(--f-ui);
+    font-size: var(--t-sm);
+    letter-spacing: 0.04em;
+    color: var(--c-ink-faint);
+    white-space: nowrap;
+  }
+  .timeline-full .body { display: grid; gap: var(--s-1); }
+  .timeline-full .title {
+    font-family: var(--f-display);
+    font-size: var(--t-lg);
+    color: var(--c-ink);
+  }
+  .timeline-full .description {
+    font-family: var(--f-prose);
+    color: var(--c-ink-soft);
+    max-width: 56ch;
+  }
+
+  @media (max-width: 560px) {
+    .timeline-full li { grid-template-columns: 1fr; gap: var(--s-2); }
+  }
+</style>

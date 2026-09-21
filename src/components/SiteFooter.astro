@@ -8,7 +8,7 @@ const hasEmail = !site.contactEmail.startsWith('REPLACE_WITH');
   <div class="page-shell inner">
     <p class="tagline">{site.tagline}</p>
     <div class="meta">
-      <span>{site.name} · Established {site.established} · {site.basedAt}</span>
+      <span>{site.name} · <a href="/about/#timeline">Since {site.established}</a> · {site.basedAt}</span>
       {hasEmail && <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>}
       {socials.length > 0 && (
         <ul>
@@ -42,7 +42,7 @@ const hasEmail = !site.contactEmail.startsWith('REPLACE_WITH');
     flex-wrap: wrap;
     gap: var(--s-2) var(--s-6);
     font-size: var(--t-sm);
-    color: var(--c-ink-faint);
+    color: var(--c-ink-soft);
   }
   .meta ul {
     display: flex;

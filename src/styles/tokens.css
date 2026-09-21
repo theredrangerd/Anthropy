@@ -40,6 +40,15 @@
 
   --measure: 66ch;
   --page-max: 1120px;
+
+  /* z-index scale: skip-link < dropdown < sticky < modal-backdrop < modal < toast < tooltip */
+  --z-skip: 10;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
 }
 
 @media (prefers-color-scheme: dark) {
