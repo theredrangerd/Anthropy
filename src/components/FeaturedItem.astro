@@ -5,15 +5,16 @@ interface Props {
   title: string;
   summary: string;
   badge?: string;
+  animateSummary?: boolean;
 }
 
-const { href, eyebrow, title, summary, badge } = Astro.props;
+const { href, eyebrow, title, summary, badge, animateSummary = false } = Astro.props;
 ---
 <article class="featured-item">
   {badge && <span class="badge">{badge}</span>}
   <p class="eyebrow">{eyebrow}</p>
   <h3><a href={href}>{title}</a></h3>
-  <p class="summary">{summary}</p>
+  <p class="summary" data-animate-summary={animateSummary ? 'true' : undefined}>{summary}</p>
 </article>
 
 <style>
@@ -45,4 +46,57 @@ const { href, eyebrow, title, summary, badge } = Astro.props;
     color: var(--c-ink-soft);
     max-width: 60ch;
   }
+  .summary[data-animate-summary].is-typing::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    background: currentColor;
+    animation: caret-blink 800ms steps(1) infinite;
+  }
+  @keyframes caret-blink {
+    50% { opacity: 0; }
+  }
 </style>
+
+<script>
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const nodes = document.querySelectorAll<HTMLElement>('[data-animate-summary]');
+  if (!reduced && nodes.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          observer.unobserve(el);
+          typeOut(el);
+        }
+      },
+      { threshold: 0.4 },
+    );
+    for (const node of nodes) observer.observe(node);
+  }
+
+  function typeOut(el: HTMLElement) {
+    const full = el.textContent ?? '';
+    if (!full) return;
+    el.textContent = '';
+    el.classList.add('is-typing');
+    // Roughly constant total duration regardless of abstract length.
+    const totalDuration = 4200;
+    const tickMs = 20;
+    const ticks = Math.max(1, Math.round(totalDuration / tickMs));
+    const charsPerTick = Math.max(1, Math.ceil(full.length / ticks));
+    let i = 0;
+    const timer = window.setInterval(() => {
+      i += charsPerTick;
+      el.textContent = full.slice(0, i);
+      if (i >= full.length) {
+        window.clearInterval(timer);
+        el.classList.remove('is-typing');
+      }
+    }, tickMs);
+  }
+</script>

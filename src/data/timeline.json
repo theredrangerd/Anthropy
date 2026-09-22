@@ -47,6 +47,13 @@
       "dateLabel": "June 2026",
       "title": "The Anthropy Review, 3rd Edition",
       "description": "Five student papers are published, spanning law, economics, political science, geography, and psychology."
+    },
+    {
+      "year": 2026,
+      "dateLabel": "September 2026",
+      "title": "New leadership team selected",
+      "description": "The next leadership team is chosen for the 2026–2027 year, taking over the research programme, the journal, and Humanities Focus.",
+      "href": "/leadership/"
     }
   ]
 }

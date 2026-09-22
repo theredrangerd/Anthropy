@@ -1,28 +1,13 @@
 ---
-const groups = [
-  {
-    label: 'Read',
-    items: [
-      { href: '/journal/', label: 'Journal' },
-      { href: '/articles/', label: 'Articles' },
-    ],
-  },
-  {
-    label: 'Programmes',
-    items: [
-      { href: '/in2academia/', label: 'In2Academia' },
-      { href: '/events/', label: 'Events' },
-    ],
-  },
-  {
-    label: 'About',
-    items: [
-      { href: '/about/', label: 'About' },
-      { href: '/leadership/', label: 'Leadership' },
-    ],
-  },
+const links = [
+  { href: '/journal/', label: 'Journal' },
+  { href: '/articles/', label: 'Articles' },
+  { href: '/in2academia/', label: 'In2Academia' },
+  { href: '/events/', label: 'Events' },
+  { href: '/about/', label: 'About' },
+  { href: '/leadership/', label: 'Leadership' },
+  { href: '/contact/', label: 'Contact' },
 ];
-const contact = { href: '/contact/', label: 'Contact' };
 
 const here = Astro.url.pathname;
 const isActive = (href: string) => here.startsWith(href);
@@ -33,66 +18,17 @@ const isActive = (href: string) => here.startsWith(href);
     <a class="wordmark" href="/">Anthropy</a>
     <nav aria-label="Primary">
       <ul>
-        {groups.map((group) => {
-          const groupActive = group.items.some((item) => isActive(item.href));
-          return (
-            <li>
-              <details class="nav-group" data-nav-group>
-                <summary aria-current={groupActive ? 'page' : undefined}>
-                  {group.label}
-                </summary>
-                <ul class="nav-panel">
-                  {group.items.map((item) => (
-                    <li>
-                      <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
-                        {item.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            </li>
-          );
-        })}
-        <li>
-          <a href={contact.href} aria-current={isActive(contact.href) ? 'page' : undefined}>
-            {contact.label}
-          </a>
-        </li>
+        {links.map((link) => (
+          <li>
+            <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+              {link.label}
+            </a>
+          </li>
+        ))}
       </ul>
     </nav>
   </div>
 </header>
-
-<script>
-  // Only one nav-group panel open at a time; close on outside click or Escape.
-  const groups = Array.from(document.querySelectorAll<HTMLDetailsElement>('[data-nav-group]'));
-
-  document.addEventListener('click', (event) => {
-    const target = event.target as Node;
-    for (const details of groups) {
-      if (details.open && !details.contains(target)) details.open = false;
-    }
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape') return;
-    const open = groups.find((details) => details.open);
-    if (open) {
-      open.open = false;
-      open.querySelector('summary')?.focus();
-    }
-  });
-
-  for (const details of groups) {
-    details.addEventListener('toggle', () => {
-      if (!details.open) return;
-      for (const other of groups) {
-        if (other !== details) other.open = false;
-      }
-    });
-  }
-</script>
 
 <style>
   .skip {
@@ -129,12 +65,11 @@ const isActive = (href: string) => here.startsWith(href);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--s-4);
+    gap: var(--s-4) var(--s-6);
     list-style: none;
     margin: 0;
     padding: 0;
   }
-  nav > ul > li { position: relative; }
   nav a {
     font-size: var(--t-sm);
     color: var(--c-ink-soft);
@@ -146,58 +81,5 @@ const isActive = (href: string) => here.startsWith(href);
     text-decoration: underline;
     text-decoration-color: var(--c-sage);
     text-underline-offset: 0.3em;
-  }
-
-  .nav-group { position: relative; }
-  .nav-group summary {
-    display: flex;
-    align-items: center;
-    gap: var(--s-1);
-    font-size: var(--t-sm);
-    color: var(--c-ink-soft);
-    cursor: pointer;
-    list-style: none;
-  }
-  .nav-group summary::-webkit-details-marker { display: none; }
-  .nav-group summary::marker { content: ''; }
-  .nav-group summary:hover { color: var(--c-ink); }
-  .nav-group summary[aria-current='page'] {
-    color: var(--c-ink);
-    text-decoration: underline;
-    text-decoration-color: var(--c-sage);
-    text-underline-offset: 0.3em;
-  }
-  .nav-group summary::after {
-    content: '';
-    width: 0.4em;
-    height: 0.4em;
-    border-right: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
-    transform: translateY(-2px) rotate(45deg);
-    transition: transform 0.15s ease-out;
-  }
-  .nav-group[open] summary::after { transform: translateY(1px) rotate(-135deg); }
-
-  .nav-panel {
-    position: absolute;
-    top: calc(100% + var(--s-3));
-    left: 0;
-    z-index: var(--z-dropdown);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--s-2);
-    min-width: 10rem;
-    padding: var(--s-3) var(--s-4);
-    background: var(--c-surface);
-    border: 1px solid var(--c-rule);
-    border-radius: 8px;
-    box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.18);
-  }
-  .nav-panel a { color: var(--c-ink-soft); white-space: nowrap; }
-  .nav-panel a:hover { color: var(--c-ink); }
-
-  @media (prefers-reduced-motion: reduce) {
-    .nav-group summary::after { transition: none; }
   }
 </style>

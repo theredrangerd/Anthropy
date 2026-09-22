@@ -6,6 +6,8 @@ interface Event {
   dateLabel: string;
   title: string;
   description: string;
+  /** Optional link target — when present, the title becomes a link. */
+  href?: string;
 }
 
 interface Props {
@@ -41,7 +43,7 @@ const shown = variant === 'compact' ? events.slice(-limit) : events;
       <li>
         <span class="date">{e.dateLabel}</span>
         <div class="body">
-          <p class="title">{e.title}</p>
+          <p class="title">{e.href ? <a href={e.href}>{e.title}</a> : e.title}</p>
           <p class="description">{e.description}</p>
         </div>
       </li>
@@ -130,6 +132,14 @@ const shown = variant === 'compact' ? events.slice(-limit) : events;
     font-family: var(--f-display);
     font-size: var(--t-lg);
     color: var(--c-ink);
+  }
+  .timeline-full .title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .timeline-full .title a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--c-sage);
   }
   .timeline-full .description {
     font-family: var(--f-prose);

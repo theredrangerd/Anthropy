@@ -14,7 +14,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
   font-family: var(--f-display);
   font-weight: 600;
   line-height: 1.12;
@@ -26,6 +26,7 @@ h1, h2, h3 {
 h1 { font-size: var(--t-3xl); }
 h2 { font-size: var(--t-2xl); }
 h3 { font-size: var(--t-lg); }
+h4 { font-size: var(--t-base); }
 
 p { margin: 0; }
 
@@ -48,6 +49,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .eyebrow {
   font-family: var(--f-ui);
+  font-weight: 400;
   font-size: var(--t-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
