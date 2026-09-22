@@ -14,7 +14,7 @@ const issues = sortByDateDesc(
 const [featured, ...rest] = issues;
 
 const items = rest.map((i) => ({
-  href: `/journal/${i.id}/`,
+  href: `${import.meta.env.BASE_URL}journal/${i.id}/`,
   title: i.data.title,
   meta: `Issue ${i.data.issueNumber} · ${formatIssueDate(i.data.publishedAt)}`,
   summary: i.data.summary,
@@ -37,7 +37,7 @@ const items = rest.map((i) => ({
     <h2>Latest issue</h2>
     {featured ? (
       <FeaturedItem
-        href={`/journal/${featured.id}/`}
+        href={`${import.meta.env.BASE_URL}journal/${featured.id}/`}
         eyebrow={`Issue ${featured.data.issueNumber} · ${formatIssueDate(featured.data.publishedAt)}`}
         title={featured.data.title}
         summary={featured.data.summary}

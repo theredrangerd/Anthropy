@@ -23,7 +23,7 @@ const allIssues = sortByDateDesc(
 const journalStrip = [...allIssues]
   .sort((a, b) => a.data.issueNumber - b.data.issueNumber)
   .map((i) => ({
-  href: `/journal/${i.id}/`,
+  href: `${import.meta.env.BASE_URL}journal/${i.id}/`,
   title: i.data.title,
   meta: `Issue ${i.data.issueNumber}`,
 }));
@@ -41,6 +41,7 @@ const stats = [
     ? [{ value: String(allIssues.length), label: allIssues.length === 1 ? 'journal issue' : 'journal issues' }]
     : []),
 ];
+const base = import.meta.env.BASE_URL;
 ---
 <BaseLayout
   title="Anthropy"
@@ -65,7 +66,7 @@ const stats = [
       <div class="editorial-main">
         {featuredArticle ? (
           <FeaturedItem
-            href={`/articles/${featuredArticle.id}/`}
+            href={`${base}articles/${featuredArticle.id}/`}
             eyebrow={`${featuredArticle.data.discipline} · ${formatIssueDate(featuredArticle.data.publishedAt)}`}
             title={featuredArticle.data.title}
             summary={featuredArticle.data.summary}
@@ -99,7 +100,7 @@ const stats = [
               {compactArticles.map((a) => (
                 <li>
                   <span class="meta">{formatIssueDate(a.data.publishedAt)}</span>
-                  <a href={`/articles/${a.id}/`}>{a.data.title}</a>
+                  <a href={`${base}articles/${a.id}/`}>{a.data.title}</a>
                 </li>
               ))}
             </ul>
@@ -113,14 +114,14 @@ const stats = [
     <h2>What we run</h2>
     <div class="tile-pair">
       <article class="tile-pair-item primary">
-        <h3><a href="/in2academia/">In2Academia</a></h3>
+        <h3><a href={`${base}in2academia/`}>In2Academia</a></h3>
         <p>
           A ten-week programme teaching secondary students how to actually conduct humanities
           research — from question to argument to a paper that gets published.
         </p>
       </article>
       <article class="tile-pair-item secondary">
-        <h3><a href="/events/">Events</a></h3>
+        <h3><a href={`${base}events/`}>Events</a></h3>
         <p>
           Our speaker programme brings researchers and academics in to talk directly with
           students.

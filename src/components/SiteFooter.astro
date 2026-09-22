@@ -8,7 +8,7 @@ const hasEmail = !site.contactEmail.startsWith('REPLACE_WITH');
   <div class="page-shell inner">
     <p class="tagline">{site.tagline}</p>
     <div class="meta">
-      <span>{site.name} · <a href="/about/#timeline">Since {site.established}</a> · {site.basedAt}</span>
+      <span>{site.name} · <a href={`${import.meta.env.BASE_URL}about/#timeline`}>Since {site.established}</a> · {site.basedAt}</span>
       {hasEmail && <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>}
       {socials.length > 0 && (
         <ul>

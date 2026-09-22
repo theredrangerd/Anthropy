@@ -3,7 +3,8 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://anthropy.wetkarma.com',
+  site: 'https://theredrangerd.github.io',
+  base: '/Anthropy/',
   output: 'static',
   integrations: [mdx(), sitemap()],
   build: { format: 'directory' },

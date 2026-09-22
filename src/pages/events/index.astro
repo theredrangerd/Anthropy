@@ -20,7 +20,7 @@ const past = sortByDateDesc(
 const [nextEvent, ...moreUpcoming] = upcoming;
 
 const toItem = (e: (typeof events)[number]) => ({
-  href: `/events/${e.id}/`,
+  href: `${import.meta.env.BASE_URL}events/${e.id}/`,
   title: e.data.name,
   meta: formatEventDate(e.data.startsAt),
   summary: e.data.summary,
@@ -44,7 +44,7 @@ const toItem = (e: (typeof events)[number]) => ({
     <section class="block">
       <h2>Next</h2>
       <FeaturedItem
-        href={`/events/${nextEvent.id}/`}
+        href={`${import.meta.env.BASE_URL}events/${nextEvent.id}/`}
         eyebrow={formatEventDate(nextEvent.data.startsAt)}
         title={nextEvent.data.name}
         summary={nextEvent.data.summary}

@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Timeline from '../components/Timeline.astro';
 import site from '../data/site.json';
+const base = import.meta.env.BASE_URL;
 ---
 <BaseLayout
   title="About Anthropy"
@@ -45,7 +46,7 @@ import site from '../data/site.json';
     <h2>What we do</h2>
     <div class="tile-pair">
       <article class="tile-pair-item primary">
-        <h3><a href="/in2academia/">In2Academia</a></h3>
+        <h3><a href={`${base}in2academia/`}>In2Academia</a></h3>
         <p>
           Over ten weeks and ten workshops, students move from a vague interest to a defined
           research question to a finished paper, working alongside academic mentors. Strong
@@ -53,7 +54,7 @@ import site from '../data/site.json';
         </p>
       </article>
       <article class="tile-pair-item secondary">
-        <h3><a href="/events/">Humanities Focus</a></h3>
+        <h3><a href={`${base}events/`}>Humanities Focus</a></h3>
         <p>
           We bring researchers, academics, and professionals in to speak directly with students —
           not as a careers talk, but as a conversation about what the work actually involves.

@@ -54,7 +54,7 @@ const tierGroups = [
               >
                 <div class="portrait">
                   {m.photo ? (
-                    <img class="avatar" src={m.photo} alt={m.name} style={`object-position: ${m.photoPosition}`} />
+                    <img class="avatar" src={`${import.meta.env.BASE_URL}${m.photo.replace(/^\//, '')}`} alt={m.name} style={`object-position: ${m.photoPosition}`} />
                   ) : (
                     <span class="avatar placeholder" aria-hidden="true">{m.name.charAt(0)}</span>
                   )}

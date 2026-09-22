@@ -50,6 +50,7 @@ const testimonials = [
     name: 'Yueqi Gou',
   },
 ];
+const base = import.meta.env.BASE_URL;
 ---
 <BaseLayout
   title="In2Academia"
@@ -116,7 +117,7 @@ const testimonials = [
     <div class="prose">
       <p>
         Applications open at the start of each cycle. If you want to know when the next one
-        opens, <a href="/contact/">get in touch</a> and we will let you know directly.
+        opens, <a href={`${base}contact/`}>get in touch</a> and we will let you know directly.
       </p>
     </div>
   </section>
@@ -127,7 +128,7 @@ const testimonials = [
       <p>
         Anthropy is also looking for academic mentors — people with a background in
         humanities or social sciences research and an interest in guiding student
-        researchers. Published research is preferred, not required. <a href="/contact/">Get in touch</a> if
+        researchers. Published research is preferred, not required. <a href={`${base}contact/`}>Get in touch</a> if
         that's you.
       </p>
     </div>

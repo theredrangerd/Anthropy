@@ -20,7 +20,7 @@ interface Props {
   moreHref?: string;
 }
 
-const { variant = 'full', limit = 4, moreHref = '/about/#timeline' } = Astro.props;
+const { variant = 'full', limit = 4, moreHref = `${import.meta.env.BASE_URL}about/#timeline` } = Astro.props;
 
 const events = (timeline.events as Event[]).slice().sort((a, b) => a.year - b.year);
 const shown = variant === 'compact' ? events.slice(-limit) : events;
@@ -43,7 +43,7 @@ const shown = variant === 'compact' ? events.slice(-limit) : events;
       <li>
         <span class="date">{e.dateLabel}</span>
         <div class="body">
-          <p class="title">{e.href ? <a href={e.href}>{e.title}</a> : e.title}</p>
+          <p class="title">{e.href ? <a href={`${import.meta.env.BASE_URL}${e.href.replace(/^\//, '')}`}>{e.title}</a> : e.title}</p>
           <p class="description">{e.description}</p>
         </div>
       </li>
