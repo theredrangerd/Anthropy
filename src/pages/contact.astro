@@ -37,13 +37,14 @@ const socials = site.socials.filter((s) => !s.url.startsWith('REPLACE_WITH'));
   </div>
 
   <div class="how">
+    <p class="eyebrow">Reach us directly</p>
     {hasEmail ? (
       <p class="email"><a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a></p>
     ) : (
       <p class="empty">Contact details are being finalised.</p>
     )}
     {socials.length > 0 && (
-      <ul>
+      <ul class="socials">
         {socials.map((s) => <li><a href={s.url}>{s.label}</a></li>)}
       </ul>
     )}
@@ -59,8 +60,9 @@ const socials = site.socials.filter((s) => !s.url.startsWith('REPLACE_WITH'));
   .routes article { display: grid; gap: var(--s-2); }
   .routes h2 { font-size: var(--t-lg); }
   .routes p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 40ch; }
-  .how { padding-block: var(--s-12); display: grid; gap: var(--s-4); border-top: 1px solid var(--c-rule); }
-  .email { font-family: var(--f-display); font-size: var(--t-xl); }
-  .how ul { display: flex; gap: var(--s-6); list-style: none; margin: 0; padding: 0; }
+  .how { padding-block: var(--s-16); display: grid; gap: var(--s-3); border-top: 1px solid var(--c-rule); }
+  .email { font-family: var(--f-display); font-size: var(--t-2xl); }
+  .socials { display: flex; gap: var(--s-6); list-style: none; margin: var(--s-2) 0 0; padding: 0; }
+  .socials a { font-family: var(--f-ui); font-size: var(--t-sm); text-transform: uppercase; letter-spacing: 0.05em; }
   .empty { font-family: var(--f-prose); font-style: italic; color: var(--c-ink-faint); }
 </style>

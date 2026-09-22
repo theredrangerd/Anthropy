@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CollectionGrid from '../../components/CollectionGrid.astro';
+import FeaturedItem from '../../components/FeaturedItem.astro';
 import { excludeDrafts, sortByDateDesc, sortByDateAsc } from '../../lib/collections';
 import { formatEventDate } from '../../lib/format';
 
@@ -15,6 +16,8 @@ const past = sortByDateDesc(
   events.filter((e) => !e.data.upcoming),
   (e) => e.data.startsAt,
 );
+
+const [nextEvent, ...moreUpcoming] = upcoming;
 
 const toItem = (e: (typeof events)[number]) => ({
   href: `/events/${e.id}/`,
@@ -37,11 +40,22 @@ const toItem = (e: (typeof events)[number]) => ({
     </p>
   </section>
 
-  {upcoming.length > 0 && (
+  {nextEvent && (
     <section class="block">
       <h2>Next</h2>
-      {/* emptyMessage is unreachable here: this block only renders when upcoming.length > 0 */}
-      <CollectionGrid items={upcoming.map(toItem)} emptyMessage="The next forum is being scheduled." />
+      <FeaturedItem
+        href={`/events/${nextEvent.id}/`}
+        eyebrow={formatEventDate(nextEvent.data.startsAt)}
+        title={nextEvent.data.name}
+        summary={nextEvent.data.summary}
+        badge="Next"
+      />
+      {moreUpcoming.length > 0 && (
+        <CollectionGrid
+          items={moreUpcoming.map(toItem)}
+          emptyMessage="No further upcoming sessions are scheduled."
+        />
+      )}
     </section>
   )}
 

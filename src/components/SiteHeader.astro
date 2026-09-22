@@ -2,13 +2,15 @@
 const links = [
   { href: '/journal/', label: 'Journal' },
   { href: '/articles/', label: 'Articles' },
-  { href: '/events/', label: 'Events' },
   { href: '/in2academia/', label: 'In2Academia' },
-  { href: '/leadership/', label: 'Leadership' },
+  { href: '/events/', label: 'Events' },
   { href: '/about/', label: 'About' },
+  { href: '/leadership/', label: 'Leadership' },
   { href: '/contact/', label: 'Contact' },
 ];
+
 const here = Astro.url.pathname;
+const isActive = (href: string) => here.startsWith(href);
 ---
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
@@ -18,7 +20,7 @@ const here = Astro.url.pathname;
       <ul>
         {links.map((link) => (
           <li>
-            <a href={link.href} aria-current={here.startsWith(link.href) ? 'page' : undefined}>
+            <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
               {link.label}
             </a>
           </li>
@@ -36,7 +38,7 @@ const here = Astro.url.pathname;
   .skip:focus {
     left: var(--s-4);
     top: var(--s-4);
-    z-index: 10;
+    z-index: var(--z-skip);
     background: var(--c-surface);
     padding: var(--s-2) var(--s-4);
   }
@@ -62,7 +64,8 @@ const here = Astro.url.pathname;
   nav ul {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--s-4);
+    align-items: center;
+    gap: var(--s-4) var(--s-6);
     list-style: none;
     margin: 0;
     padding: 0;

@@ -25,23 +25,11 @@ const { from, to } = Astro.props;
   /* inline-block, not inline: the strike keyframe animates max-width,
      which has no effect on a non-replaced inline element. */
   .revision[data-armed='true'] .struck { display: inline-block; }
-  .revision[data-armed='true'] .final {
-    background-image: linear-gradient(var(--c-sage-soft), var(--c-sage-soft));
-    background-repeat: no-repeat;
-    background-size: 0% 100%;
-  }
   .revision[data-revealed='true'] .struck {
     animation: strike 420ms ease forwards;
   }
-  .revision[data-revealed='true'] .final {
-    animation: wash 520ms 260ms ease forwards;
-  }
   @keyframes strike {
     to { opacity: 0; max-width: 0; margin-right: 0; }
-  }
-  @keyframes wash {
-    from { background-size: 0% 100%; }
-    to { background-size: 100% 100%; }
   }
 </style>
 

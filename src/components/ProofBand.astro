@@ -7,9 +7,16 @@ interface Outcome {
   note?: string;
 }
 
+interface Testimonial {
+  quote: string;
+  name: string;
+  role?: string;
+}
+
 const outcomes = alumni.outcomes as Outcome[];
+const testimonials = (alumni.testimonials ?? []) as Testimonial[];
 ---
-{outcomes.length > 0 && (
+{outcomes.length > 0 ? (
   <section class="proof" aria-labelledby="proof-heading">
     <p class="eyebrow" id="proof-heading">Where our contributors go next</p>
     <ul class="auto-grid">
@@ -18,6 +25,21 @@ const outcomes = alumni.outcomes as Outcome[];
           <span class="dest">{o.destination}</span>
           <span class="who">{o.name}</span>
           {o.note && <span class="note">{o.note}</span>}
+        </li>
+      ))}
+    </ul>
+  </section>
+) : testimonials.length > 0 && (
+  <section class="proof proof-quotes" aria-labelledby="proof-heading">
+    <p class="eyebrow" id="proof-heading">What they took away</p>
+    <ul class="auto-grid">
+      {testimonials.map((t) => (
+        <li>
+          <blockquote>{t.quote}</blockquote>
+          <cite>
+            <span class="name">{t.name}</span>
+            {t.role && <span class="role"> · {t.role}</span>}
+          </cite>
         </li>
       ))}
     </ul>
@@ -43,4 +65,49 @@ const outcomes = alumni.outcomes as Outcome[];
   }
   .who { font-size: var(--t-sm); color: var(--c-ink-soft); }
   .note { font-size: var(--t-xs); color: var(--c-ink-faint); }
+
+  .proof-quotes ul {
+    --auto-grid-min: 280px;
+    --auto-grid-gap: var(--s-8);
+  }
+  .proof-quotes li { gap: var(--s-2); }
+  .proof-quotes blockquote::before {
+    content: '“';
+    display: block;
+    font-family: var(--f-display);
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 3rem;
+    line-height: 0.6;
+    color: var(--c-rust);
+  }
+  .proof-quotes blockquote {
+    margin: 0 0 var(--s-1);
+    font-family: var(--f-display);
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-size: clamp(1.2rem, 1.05rem + 0.5vw, 1.45rem);
+    font-style: italic;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+    color: var(--c-ink);
+  }
+  .proof-quotes cite {
+    display: block;
+    font-style: normal;
+  }
+  .proof-quotes .name {
+    font-family: var(--f-ui);
+    font-weight: 500;
+    font-size: var(--t-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-ink);
+  }
+  .proof-quotes .role {
+    font-family: var(--f-ui);
+    font-size: var(--t-xs);
+    color: var(--c-ink-faint);
+  }
 </style>

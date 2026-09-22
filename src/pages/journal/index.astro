@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CollectionGrid from '../../components/CollectionGrid.astro';
+import FeaturedItem from '../../components/FeaturedItem.astro';
 import { excludeDrafts, sortByDateDesc } from '../../lib/collections';
 import { formatIssueDate } from '../../lib/format';
 
@@ -10,7 +11,9 @@ const issues = sortByDateDesc(
   (i) => i.data.publishedAt,
 );
 
-const items = issues.map((i) => ({
+const [featured, ...rest] = issues;
+
+const items = rest.map((i) => ({
   href: `/journal/${i.id}/`,
   title: i.data.title,
   meta: `Issue ${i.data.issueNumber} · ${formatIssueDate(i.data.publishedAt)}`,
@@ -29,11 +32,27 @@ const items = issues.map((i) => ({
       edited with academic mentors.
     </p>
   </section>
+
   <section class="block">
-    <h2>Issues</h2>
+    <h2>Latest issue</h2>
+    {featured ? (
+      <FeaturedItem
+        href={`/journal/${featured.id}/`}
+        eyebrow={`Issue ${featured.data.issueNumber} · ${formatIssueDate(featured.data.publishedAt)}`}
+        title={featured.data.title}
+        summary={featured.data.summary}
+        badge="Latest issue"
+      />
+    ) : (
+      <p class="empty">The inaugural issue is in preparation. Check back, or write to us if you would like to contribute.</p>
+    )}
+  </section>
+
+  <section class="block">
+    <h2>Earlier issues</h2>
     <CollectionGrid
       items={items}
-      emptyMessage="The inaugural issue is in preparation. Check back, or write to us if you would like to contribute."
+      emptyMessage="No earlier issues yet."
     />
   </section>
 </BaseLayout>

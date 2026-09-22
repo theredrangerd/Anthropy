@@ -1,3 +1,20 @@
 {
-  "outcomes": []
+  "outcomes": [],
+  "testimonials": [
+    {
+      "quote": "I have solidified practical research and analytical writing skills that I can apply in the future.",
+      "name": "Derek Shih",
+      "role": "'26 In-2-Academia participant"
+    },
+    {
+      "quote": "Through this program, I learned how to move from surface-level summaries and engage in true critical analysis.",
+      "name": "Anahita Ghosh Singh",
+      "role": "'26 In-2-Academia participant"
+    },
+    {
+      "quote": "I particularly enjoyed the opportunity to connect with people who are passionate about their field.",
+      "name": "Simrin Khaitan",
+      "role": "'26 In-2-Academia participant"
+    }
+  ]
 }

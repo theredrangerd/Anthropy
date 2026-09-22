@@ -2,47 +2,52 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProofBand from '../components/ProofBand.astro';
-import CollectionGrid from '../components/CollectionGrid.astro';
+import FeaturedItem from '../components/FeaturedItem.astro';
 import RevisionReveal from '../components/RevisionReveal.astro';
+import Timeline from '../components/Timeline.astro';
 import { excludeDrafts, sortByDateDesc, sortByDateAsc } from '../lib/collections';
 import { formatIssueDate, formatEventDate } from '../lib/format';
 import site from '../data/site.json';
 
-const articles = sortByDateDesc(
+const allArticles = sortByDateDesc(
   excludeDrafts(await getCollection('articles')),
   (a) => a.data.publishedAt,
-).slice(0, 3);
+);
+const [featuredArticle, ...restArticles] = allArticles;
+const compactArticles = restArticles.slice(0, 3);
 
-const issues = sortByDateDesc(
+const allIssues = sortByDateDesc(
   excludeDrafts(await getCollection('journal')),
   (i) => i.data.publishedAt,
-).slice(0, 2);
+);
+const journalStrip = [...allIssues]
+  .sort((a, b) => a.data.issueNumber - b.data.issueNumber)
+  .map((i) => ({
+  href: `/journal/${i.id}/`,
+  title: i.data.title,
+  meta: `Issue ${i.data.issueNumber}`,
+}));
 
 const upcoming = sortByDateAsc(
   excludeDrafts(await getCollection('events')).filter((e) => e.data.upcoming),
   (e) => e.data.startsAt,
 );
 
-const articleItems = articles.map((a) => ({
-  href: `/articles/${a.id}/`,
-  title: a.data.title,
-  meta: `${a.data.discipline} · ${formatIssueDate(a.data.publishedAt)}`,
-  summary: a.data.summary,
-}));
-
-const issueItems = issues.map((i) => ({
-  href: `/journal/${i.id}/`,
-  title: i.data.title,
-  meta: `Issue ${i.data.issueNumber} · ${formatIssueDate(i.data.publishedAt)}`,
-  summary: i.data.summary,
-}));
+const stats = [
+  ...(allArticles.length > 0
+    ? [{ value: String(allArticles.length), label: allArticles.length === 1 ? 'paper published' : 'papers published' }]
+    : []),
+  ...(allIssues.length > 0
+    ? [{ value: String(allIssues.length), label: allIssues.length === 1 ? 'journal issue' : 'journal issues' }]
+    : []),
+];
 ---
 <BaseLayout
   title="Anthropy"
-  description="Anthropy is a student-led humanities research organization at UWC Dover. We publish student research and bring academics into conversation with the students who will follow them."
+  description="Anthropy is a student-led humanities research organization based at UWC South East Asia's Dover Campus, with international reach. We publish student research and bring academics into conversation with the students who will follow them."
 >
   <section class="thesis">
-    <p class="eyebrow">Humanities research · UWC Dover · Est. {site.established}</p>
+    <p class="eyebrow">Humanities research · UWC Dover, with international reach · Since {site.established}</p>
     <h1>We do not set out to change the humanities. We set out to prepare the people who will.</h1>
     <p class="lede">
       Anthropy runs a research programme, publishes a student academic journal, and brings
@@ -54,34 +59,68 @@ const issueItems = issues.map((i) => ({
 
   <ProofBand />
 
-  <section class="block">
+  <section class="block editorial">
     <h2>Recent work</h2>
-    <CollectionGrid
-      items={articleItems}
-      emptyMessage="The first papers of this cycle are being prepared for publication."
-    />
-  </section>
-
-  <section class="block">
-    <h2>The journal</h2>
-    <CollectionGrid
-      items={issueItems}
-      emptyMessage="The inaugural issue is in preparation."
-    />
+    <div class="editorial-grid">
+      <div class="editorial-main">
+        {featuredArticle ? (
+          <FeaturedItem
+            href={`/articles/${featuredArticle.id}/`}
+            eyebrow={`${featuredArticle.data.discipline} · ${formatIssueDate(featuredArticle.data.publishedAt)}`}
+            title={featuredArticle.data.title}
+            summary={featuredArticle.data.summary}
+            badge="Latest"
+            animateSummary
+          />
+        ) : (
+          <p class="empty">The first papers of this cycle are being prepared for publication.</p>
+        )}
+        {journalStrip.length > 0 && (
+          <div class="journal-strip">
+            <h3 class="eyebrow">The journal</h3>
+            <ul class="journal-strip-grid">
+              {journalStrip.map((item) => (
+                <li>
+                  <article>
+                    <p class="eyebrow">{item.meta}</p>
+                    <h4><a href={item.href}>{item.title}</a></h4>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+      <div class="editorial-aside">
+        {compactArticles.length > 0 && (
+          <>
+            <h3 class="eyebrow">More recent work</h3>
+            <ul class="compact-list">
+              {compactArticles.map((a) => (
+                <li>
+                  <span class="meta">{formatIssueDate(a.data.publishedAt)}</span>
+                  <a href={`/articles/${a.id}/`}>{a.data.title}</a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
+    </div>
   </section>
 
   <section class="block programmes">
     <h2>What we run</h2>
-    <div class="two auto-grid">
-      <article>
+    <div class="tile-pair">
+      <article class="tile-pair-item primary">
         <h3><a href="/in2academia/">In2Academia</a></h3>
         <p>
           A ten-week programme teaching secondary students how to actually conduct humanities
           research — from question to argument to a paper that gets published.
         </p>
       </article>
-      <article>
-        <h3><a href="/events/">Humanities Focus</a></h3>
+      <article class="tile-pair-item secondary">
+        <h3><a href="/events/">Events</a></h3>
         <p>
           Our speaker programme brings researchers and academics in to talk directly with
           students.
@@ -92,12 +131,31 @@ const issueItems = issues.map((i) => ({
       </article>
     </div>
   </section>
+
+  <section class="block timeline-section">
+    <h2>Our story so far</h2>
+    <Timeline variant="compact" />
+  </section>
+
+  {stats.length > 0 && (
+    <section class="fact-strip">
+      <ul>
+        {stats.map((s) => (
+          <li>
+            <span class="value">{s.value}</span>
+            <span class="label">{s.label}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
 </BaseLayout>
 
 <style>
   .thesis {
     display: grid;
     gap: var(--s-6);
+    max-width: 640px;
     padding-block: var(--s-24) var(--s-16);
   }
   .thesis h1 { max-width: 18ch; }
@@ -107,15 +165,58 @@ const issueItems = issues.map((i) => ({
     color: var(--c-ink-soft);
     max-width: 52ch;
   }
-  .block {
+
+  .block { display: grid; gap: var(--s-6); padding-block: var(--s-16); }
+
+  .editorial-grid {
     display: grid;
-    gap: var(--s-6);
-    padding-block: var(--s-16);
+    grid-template-columns: 3fr 2fr;
+    gap: var(--s-8);
+    align-items: start;
   }
-  .two {
-    --auto-grid-min: 280px;
+  .editorial-main { display: grid; gap: var(--s-8); align-content: start; }
+  .editorial-aside { display: grid; gap: var(--s-4); align-content: start; }
+  .journal-strip { display: grid; gap: var(--s-4); }
+  .journal-strip-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-4);
   }
-  .two article { display: grid; gap: var(--s-2); }
-  .two p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 46ch; }
-  .two h3 a { text-decoration: none; }
+  .journal-strip-grid article {
+    display: grid;
+    gap: var(--s-2);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--c-rule);
+  }
+  .journal-strip-grid a { text-decoration: none; }
+  .journal-strip-grid a:hover { text-decoration: underline; text-decoration-color: var(--c-sage); }
+
+  /* Mirrors journal-strip-grid's eyebrow-then-title order, so every title
+     in this section — featured, journal issue, or compact — reads the
+     same way: a small dated label above a serif title. */
+  .compact-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-4); }
+  .compact-list li {
+    display: grid;
+    gap: var(--s-1);
+    border-top: 1px solid var(--c-rule);
+    padding-top: var(--s-3);
+  }
+  .compact-list a {
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: var(--t-base);
+    line-height: 1.25;
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  .compact-list a:hover { text-decoration: underline; text-decoration-color: var(--c-sage); }
+  .compact-list .meta { font-size: var(--t-xs); color: var(--c-ink-faint); }
+
+  @media (max-width: 720px) {
+    .editorial-grid { grid-template-columns: 1fr; }
+    .journal-strip-grid { grid-template-columns: 1fr; }
+  }
 </style>
