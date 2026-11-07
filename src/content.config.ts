@@ -9,6 +9,16 @@ const journal = defineCollection({
     publishedAt: z.coerce.date(),
     summary: z.string(),
     pdf: z.string().optional(),
+    /** Cover image under public/, e.g. "/journal/covers/2026-issue-3.webp". 990x1400 source, 3:4. */
+    cover: z.string().optional(),
+    /** One-line abstract per paper, drawn from the editor-in-chief's letter. */
+    papers: z.array(
+      z.object({
+        title: z.string(),
+        author: z.string(),
+        abstract: z.string(),
+      }),
+    ).default([]),
     draft: z.boolean().default(false),
   }),
 });

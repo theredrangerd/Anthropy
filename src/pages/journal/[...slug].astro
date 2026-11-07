@@ -1,6 +1,7 @@
 ---
-import { getCollection, render } from 'astro:content';
-import ProseLayout from '../../layouts/ProseLayout.astro';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PdfPages from '../../components/PdfPages.astro';
 import { excludeDrafts } from '../../lib/collections';
 import { formatIssueDate } from '../../lib/format';
 
@@ -13,15 +14,145 @@ export async function getStaticPaths() {
 }
 
 const { issue } = Astro.props;
-const { Content } = await render(issue);
+const { title, summary, issueNumber, publishedAt, pdf, cover, papers } = issue.data;
+const coverUrl = cover ? `${import.meta.env.BASE_URL}${cover.replace(/^\//, '')}` : undefined;
+/** "Name (Affiliation)" splits into a name and a quieter affiliation run. */
+const splitAuthor = (a: string) => {
+  const m = a.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+  return m ? { name: m[1], affiliation: m[2] } : { name: a, affiliation: undefined };
+};
+const pdfUrl = pdf ? `${import.meta.env.BASE_URL}${pdf.replace(/^\//, '')}` : undefined;
 ---
-<ProseLayout
-  title={issue.data.title}
-  description={issue.data.summary}
-  eyebrow={`Issue ${issue.data.issueNumber} · ${formatIssueDate(issue.data.publishedAt)}`}
->
-  <Content />
-  {issue.data.pdf && (
-    <p><a href={`${import.meta.env.BASE_URL}${issue.data.pdf.replace(/^\//, '')}`}>Download the full issue (PDF)</a></p>
-  )}
-</ProseLayout>
+<BaseLayout title={title} description={summary} wide>
+  <div class="reader">
+    <div class="contents">
+      <a class="back" href={`${import.meta.env.BASE_URL}journal/`}>All issues</a>
+      <header>
+        <h1>{title}</h1>
+        <p class="meta">Issue {issueNumber} · {formatIssueDate(publishedAt)}</p>
+        <p class="lede">{summary}</p>
+      </header>
+
+      {papers.length > 0 && (
+        <ul class="papers" aria-label="Papers in this issue">
+          {papers.map((p) => (
+            <li>
+              <h2>{p.title}</h2>
+              <p class="author">
+                {splitAuthor(p.author).name}
+                {splitAuthor(p.author).affiliation && <span class="aff">{splitAuthor(p.author).affiliation}</span>}
+              </p>
+              <p class="abstract">{p.abstract}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {pdfUrl && (
+        <p class="download"><a href={pdfUrl} download>Download the full issue (PDF)</a></p>
+      )}
+    </div>
+
+    {pdfUrl && (
+      <div class="viewer-col">
+        <div class="viewer">
+          <PdfPages src={pdfUrl} title={`${title}, full issue`} cover={coverUrl} downloadHref={pdfUrl} />
+        </div>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .reader {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    /* Run the backdrop flush into the footer instead of leaving its top margin as a bare strip. */
+    margin-bottom: calc(var(--s-24) * -1);
+  }
+
+  .contents {
+    display: grid;
+    gap: var(--s-8);
+    padding: var(--s-12) var(--s-8) var(--s-16) max(var(--s-6), calc((100vw - var(--page-max)) / 2 + var(--s-6)));
+    max-width: 100%;
+  }
+
+  .back {
+    font-size: var(--t-sm);
+    color: var(--c-ink-soft);
+    justify-self: start;
+  }
+  .back::before { content: '\2190\00a0'; }
+
+  header { display: grid; gap: var(--s-3); }
+  h1 { font-size: var(--t-2xl); text-wrap: balance; }
+  .meta { font-size: var(--t-sm); color: var(--c-ink-faint); font-variant-numeric: tabular-nums; }
+  .lede {
+    font-family: var(--f-prose);
+    font-size: var(--t-base);
+    color: var(--c-ink-soft);
+    line-height: 1.6;
+    max-width: 52ch;
+    margin-top: var(--s-2);
+  }
+
+  .papers { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--c-rule); }
+  .papers li {
+    display: grid;
+    gap: var(--s-2);
+    padding-block: var(--s-6);
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .papers h2 { font-size: var(--t-lg); line-height: 1.25; letter-spacing: 0; }
+  .author {
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--c-navy-mid);
+  }
+  .aff { font-weight: 400; color: var(--c-ink-faint); margin-left: var(--s-2); }
+  .aff::before { content: '\00b7\00a0'; }
+  .abstract {
+    font-family: var(--f-prose);
+    font-size: 1.02rem;
+    line-height: 1.6;
+    color: var(--c-ink);
+    max-width: 60ch;
+    text-wrap: pretty;
+  }
+
+  .download a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: var(--s-6);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--c-on-navy);
+    background: var(--c-navy);
+  }
+  .download a:hover { background: var(--c-navy-mid); }
+
+  /* The column carries the backdrop to the footer, so the sticky panel never
+     leaves a white gap or ends against the footer with a hard edge. */
+  .viewer-col {
+    background: var(--c-sunk);
+    border-left: 1px solid var(--c-rule);
+    padding-bottom: var(--s-8);
+    align-self: stretch;
+  }
+  .viewer {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+
+  @media (max-width: 900px) {
+    .reader { grid-template-columns: minmax(0, 1fr); }
+    .contents { padding: var(--s-8) var(--s-6) var(--s-8); }
+    .viewer-col { border-left: 0; border-top: 1px solid var(--c-rule); padding-bottom: 0; }
+    .viewer { position: static; height: 80svh; }
+  }
+</style>

@@ -18,7 +18,7 @@ const testimonials = (alumni.testimonials ?? []) as Testimonial[];
 ---
 {outcomes.length > 0 ? (
   <section class="proof" aria-labelledby="proof-heading">
-    <p class="eyebrow" id="proof-heading">Where our contributors go next</p>
+    <h2 id="proof-heading">Where our contributors go next</h2>
     <ul class="auto-grid">
       {outcomes.map((o) => (
         <li>
@@ -31,7 +31,7 @@ const testimonials = (alumni.testimonials ?? []) as Testimonial[];
   </section>
 ) : testimonials.length > 0 && (
   <section class="proof proof-quotes" aria-labelledby="proof-heading">
-    <p class="eyebrow" id="proof-heading">What they took away</p>
+    <h2 id="proof-heading">What they took away</h2>
     <ul class="auto-grid">
       {testimonials.map((t) => (
         <li>
@@ -48,11 +48,12 @@ const testimonials = (alumni.testimonials ?? []) as Testimonial[];
 
 <style>
   .proof {
-    border-block: 1px solid var(--c-rule);
-    padding-block: var(--s-8);
+    border-top: 1px solid var(--c-rule);
+    padding-block: var(--s-16);
     display: grid;
     gap: var(--s-6);
   }
+  .proof h2 { font-size: var(--t-2xl); color: var(--c-navy); }
   .proof ul {
     --auto-grid-min: 220px;
     --auto-grid-gap: var(--s-6);
@@ -101,8 +102,6 @@ const testimonials = (alumni.testimonials ?? []) as Testimonial[];
     font-family: var(--f-ui);
     font-weight: 500;
     font-size: var(--t-xs);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: var(--c-ink);
   }
   .proof-quotes .role {

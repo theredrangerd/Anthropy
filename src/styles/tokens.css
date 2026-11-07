@@ -1,23 +1,34 @@
 :root {
-  /* Ground & ink — light */
-  --c-ground: #FBF9F4;
-  --c-surface: #FFFFFF;
-  --c-sunk: #F2EEE5;
-  --c-ink: #14243A;
-  --c-ink-soft: #46566C;
-  --c-ink-faint: #606E80;
-  --c-rule: #E0DACD;
+  color-scheme: light;
 
-  /* Accents */
-  --c-sage: #4E6B57;
-  --c-sage-soft: #E6EDE6;
-  --c-rust: #A8492A;
-  --c-rust-soft: #F6E7E0;
+  /* Ground & ink — light. Cool white stock, navy ink, taken from the
+     Issue 3 cover's slate and brass. */
+  --c-ground: #FFFFFF;
+  --c-surface: #FFFFFF;
+  --c-sunk: #F2F5F8;
+  --c-ink: #15222F;
+  --c-ink-soft: #435262;
+  --c-ink-faint: #5A6775;
+  --c-rule: #D3DAE1;
+
+  /* Navy is the structural colour (masthead, buttons, rules); brass is the
+     cover's tan, used only for thin rules and on-navy details. */
+  --c-navy: #1F3347;
+  --c-navy-mid: #324E66;
+  --c-brass: #B59E7F;
+  --c-on-navy: #F2F5F8;
+  --c-on-navy-soft: #B9C6D3;
+
+  /* Accents (legacy names kept so older pages inherit the new palette) */
+  --c-sage: #2C4A66;
+  --c-sage-soft: #E8EEF4;
+  --c-rust: #7C5A2B;
+  --c-rust-soft: #F4EFE6;
 
   /* Type */
-  --f-display: 'Fraunces', Georgia, serif;
-  --f-prose: 'Newsreader', Georgia, serif;
-  --f-ui: 'Archivo', -apple-system, 'Segoe UI', sans-serif;
+  --f-display: 'Libre Caslon Text', 'Iowan Old Style', Georgia, serif;
+  --f-prose: 'Source Serif 4', Georgia, serif;
+  --f-ui: 'Public Sans', -apple-system, 'Segoe UI', sans-serif;
 
   --t-xs: 0.78rem;
   --t-sm: 0.9rem;
@@ -49,34 +60,4 @@
   --z-modal: 50;
   --z-toast: 60;
   --z-tooltip: 70;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --c-ground: #101A26;
-    --c-surface: #16222F;
-    --c-sunk: #0B131C;
-    --c-ink: #EDE8DD;
-    --c-ink-soft: #B8C2CD;
-    --c-ink-faint: #808E9D;
-    --c-rule: #27343F;
-    --c-sage: #8FB097;
-    --c-sage-soft: #1D2B2E;
-    --c-rust: #D9845F;
-    --c-rust-soft: #2B2419;
-  }
-}
-
-:root[data-theme='dark'] {
-  --c-ground: #101A26;
-  --c-surface: #16222F;
-  --c-sunk: #0B131C;
-  --c-ink: #EDE8DD;
-  --c-ink-soft: #B8C2CD;
-  --c-ink-faint: #808E9D;
-  --c-rule: #27343F;
-  --c-sage: #8FB097;
-  --c-sage-soft: #1D2B2E;
-  --c-rust: #D9845F;
-  --c-rust-soft: #2B2419;
 }

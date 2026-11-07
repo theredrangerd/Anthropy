@@ -16,9 +16,9 @@ body {
 
 h1, h2, h3, h4 {
   font-family: var(--f-display);
-  font-weight: 600;
-  line-height: 1.12;
-  letter-spacing: -0.015em;
+  font-weight: 700;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
   text-wrap: balance;
   margin: 0;
 }
@@ -51,8 +51,6 @@ img { max-width: 100%; height: auto; display: block; }
   font-family: var(--f-ui);
   font-weight: 400;
   font-size: var(--t-xs);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--c-ink-faint);
 }
 
@@ -152,3 +150,28 @@ img { max-width: 100%; height: auto; display: block; }
 @media (max-width: 720px) {
   .tile-pair { grid-template-columns: 1fr; }
 }
+
+::selection { background: var(--c-navy-mid); color: var(--c-on-navy); }
+
+.btn {
+  display: inline-block;
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: var(--t-sm);
+  letter-spacing: 0.02em;
+  padding: 0.85rem 1.6rem;
+  background: var(--c-navy);
+  color: var(--c-on-navy);
+  text-decoration: none;
+  border: 1px solid var(--c-navy);
+  transition: background-color 160ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.btn:hover { background: var(--c-navy-mid); border-color: var(--c-navy-mid); }
+.btn.ghost { background: transparent; color: var(--c-navy); }
+.btn.ghost:hover { background: var(--c-sage-soft); }
+
+/* Full-bleed colour bands inside .page-shell. `.lift` is the lighter navy used
+   for page-title banners (In2Academia, Articles). */
+.band { background: var(--band); box-shadow: 0 0 0 100vmax var(--band); clip-path: inset(0 -100vmax); }
+.band.lift { --band: #293F56; color: var(--c-on-navy); }
+.band.lift h1 { color: var(--c-on-navy); }

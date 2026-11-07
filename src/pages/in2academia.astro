@@ -1,10 +1,22 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { excludeDrafts, sortByDateDesc } from '../lib/collections';
+import { formatIssueDate } from '../lib/format';
 
-const stats = [
-  { value: '10 weeks', label: 'a deeper dive' },
-  { value: '10 workshops', label: 'across two months' },
-  { value: '1 paper', label: 'written, start to finish' },
+const base = import.meta.env.BASE_URL;
+
+// Every issue of the journal was developed through In2Academia, so the issue
+// list is the programme's record. New issues appear here without a template edit.
+const issues = sortByDateDesc(
+  excludeDrafts(await getCollection('journal')),
+  (i) => i.data.publishedAt,
+);
+
+const arc = [
+  'An area of interest',
+  'A defined research question',
+  'A finished paper',
 ];
 
 const pillars = [
@@ -22,24 +34,18 @@ const pillars = [
   },
   {
     title: 'A real shot at publication',
-    body: 'Strong papers are considered for the Anthropy Academic Journal and the website archive.',
+    body: 'Strong papers are published in the Anthropy Review and the website archive.',
   },
 ];
 
-const disciplines = ['Politics', 'Society', 'History', 'Economics', 'Culture', '& more'];
-
-const testimonials = [
-  {
-    quote: 'I have solidified practical research and analytical writing skills that I can apply in the future.',
-    name: 'Derek Shih',
-  },
-  {
-    quote: 'I will forever be grateful for this opportunity.',
-    name: 'Victoria Do',
-  },
+const [featuredQuote, ...quotes] = [
   {
     quote: 'Through this program, I learned how to move from surface level summaries and engage in true critical analysis.',
     name: 'Anahita Ghosh Singh',
+  },
+  {
+    quote: 'I have solidified practical research and analytical writing skills that I can apply in the future.',
+    name: 'Derek Shih',
   },
   {
     quote: 'I particularly enjoyed the opportunity to connect with people who are passionate about their field.',
@@ -49,38 +55,76 @@ const testimonials = [
     quote: 'In-2-Academia truly guided me through every step from scratch.',
     name: 'Yueqi Gou',
   },
+  {
+    quote: 'I will forever be grateful for this opportunity.',
+    name: 'Victoria Do',
+  },
 ];
-const base = import.meta.env.BASE_URL;
 ---
 <BaseLayout
   title="In2Academia"
   description="A ten-week programme teaching secondary students how to conduct humanities research and publish a paper."
 >
-  <section class="head">
-    <p class="eyebrow">Research programme</p>
+  <section class="head band lift">
     <h1>In2Academia</h1>
-    <p class="lede">Explore. Research. Belong.</p>
     <div class="prose">
       <p>
         In2Academia is a ten-week programme that teaches secondary students how to do
         humanities research properly — and then has them do it.
       </p>
     </div>
+    <p class="actions">
+      <a class="btn" href={`${base}contact/`}>Ask about the next cycle</a>
+      <a class="btn ghost" href={`${base}journal/`}>Read the journal</a>
+    </p>
   </section>
 
-  <section class="stats">
-    <ul class="auto-grid">
-      {stats.map((s) => (
+  <section class="block published band tan" aria-labelledby="published-h">
+    <h2 id="published-h">What students have published</h2>
+    <p class="intro">
+      Every issue of the Anthropy Review was written through the programme, on topics from
+      politics and history to economics and culture.
+    </p>
+    <ul class="issues auto-grid">
+      {issues.map((i) => (
         <li>
-          <span class="value">{s.value}</span>
-          <span class="label">{s.label}</span>
+          <a href={`${base}journal/${i.id}/`}>
+            <picture>
+              <source type="image/webp" srcset={`${base}journal/covers/${i.id}.webp`} />
+              <img
+                src={`${base}journal/covers/${i.id}.png`}
+                alt={`Cover of ${i.data.title}`}
+                width="990"
+                height="1400"
+                loading="lazy"
+              />
+            </picture>
+            <span class="issue-title">{i.data.title}</span>
+          </a>
+          <span class="issue-meta">
+            {formatIssueDate(i.data.publishedAt)} · {i.data.papers.length} student papers
+          </span>
         </li>
       ))}
     </ul>
+    <p><a href={`${base}articles/`}>Read the individual articles</a></p>
   </section>
 
-  <section class="block">
-    <h2>What you get</h2>
+  <section class="block band slate" aria-labelledby="arc-h">
+    <h2 id="arc-h">Ten weeks, ten workshops, one paper</h2>
+    <ol class="arc">
+      {arc.map((stage) => (
+        <li>{stage}</li>
+      ))}
+    </ol>
+    <div class="weeks" aria-hidden="true">
+      {Array.from({ length: 10 }, () => <span></span>)}
+    </div>
+    <p class="intro">A mentor gives you tailored feedback in every session.</p>
+  </section>
+
+  <section class="block" aria-labelledby="get-h">
+    <h2 id="get-h">What you get</h2>
     <ul class="pillars auto-grid">
       {pillars.map((p) => (
         <li>
@@ -91,117 +135,179 @@ const base = import.meta.env.BASE_URL;
     </ul>
   </section>
 
-  <section class="block">
-    <h2>Disciplines</h2>
-    <ul class="tags">
-      {disciplines.map((d) => (
-        <li>{d}</li>
-      ))}
-    </ul>
-  </section>
-
-  <section class="block">
-    <h2>What past students say</h2>
-    <ul class="testimonials auto-grid">
-      {testimonials.map((t) => (
+  <section class="block band tan" aria-labelledby="say-h">
+    <h2 id="say-h">What past students say</h2>
+    <figure class="featured-quote">
+      <blockquote>“{featuredQuote.quote}”</blockquote>
+      <figcaption>{featuredQuote.name}</figcaption>
+    </figure>
+    <ul class="quotes">
+      {quotes.map((t) => (
         <li>
-          <blockquote>“{t.quote}”</blockquote>
-          <p class="who">{t.name}, ’26 In2Academia participant</p>
+          <figure>
+            <blockquote>“{t.quote}”</blockquote>
+            <figcaption>{t.name}</figcaption>
+          </figure>
         </li>
       ))}
     </ul>
+    <p class="source">From participants in the 2026 cohort.</p>
   </section>
 
-  <section class="block">
-    <h2>Joining</h2>
-    <div class="prose">
-      <p>
-        Applications open at the start of each cycle. If you want to know when the next one
-        opens, <a href={`${base}contact/`}>get in touch</a> and we will let you know directly.
-      </p>
+  <section class="join band slate" aria-label="Join In2Academia">
+    <div class="join-col">
+      <h2>Join the next cycle</h2>
+      <div class="prose">
+        <p>
+          In2Academia is for secondary students. Applications open at the start of each
+          cycle; write to us and we will tell you directly when the next one opens.
+        </p>
+      </div>
+      <p class="actions"><a class="btn" href={`${base}contact/`}>Ask about the next cycle</a></p>
     </div>
-  </section>
-
-  <section class="mentor">
-    <h2>Become a mentor</h2>
-    <div class="prose">
-      <p>
-        Anthropy is also looking for academic mentors — people with a background in
-        humanities or social sciences research and an interest in guiding student
-        researchers. Published research is preferred, not required. <a href={`${base}contact/`}>Get in touch</a> if
-        that's you.
-      </p>
+    <div class="join-col">
+      <h2>Become a mentor</h2>
+      <div class="prose">
+        <p>
+          Anthropy is also looking for academic mentors — people with a background in
+          humanities or social sciences research and an interest in guiding student
+          researchers. Published research is preferred, not required.
+        </p>
+      </div>
+      <p class="actions"><a class="btn ghost" href={`${base}contact/`}>Offer to mentor</a></p>
     </div>
   </section>
 </BaseLayout>
 
 <style>
+  .band.lift .btn { background: var(--c-brass); border-color: var(--c-brass); color: var(--c-navy); }
+  .band.lift .btn:hover { background: #C7B499; border-color: #C7B499; }
+  .band.lift .btn.ghost { background: transparent; color: var(--c-on-navy); border-color: var(--c-on-navy-soft); }
+  .band.lift .btn.ghost:hover { background: var(--c-navy-mid); }
+  .band.lift :focus-visible { outline-color: var(--c-brass); }
+  .band.slate { --band: var(--c-sage-soft); }
+  .band.tan { --band: var(--c-rust-soft); }
+
   .head {
     display: grid;
-    gap: var(--s-4);
-    padding-block: var(--s-16) var(--s-8);
-    max-width: var(--measure);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-6);
+    padding-block: var(--s-12) var(--s-8);
   }
-  .lede {
-    font-family: var(--f-prose);
-    font-size: var(--t-lg);
-    color: var(--c-ink-soft);
-  }
+  .head > * { max-width: var(--measure); }
+  .head h1 { font-size: clamp(2.4rem, 12vw, var(--t-3xl)); overflow-wrap: anywhere; }
   .prose { font-family: var(--f-prose); }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .actions .btn { min-height: 44px; display: inline-flex; align-items: center; }
 
-  .stats {
-    border-block: 1px solid var(--c-rule);
-    padding-block: var(--s-8);
+  .block { padding-block: var(--s-12); display: grid; gap: var(--s-6); }
+  .published { margin-top: -1px; padding-top: calc(var(--s-6) + 1px); padding-bottom: var(--s-16); }
+  .intro { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 56ch; }
+
+  .issues { --auto-grid-min: 200px; --auto-grid-gap: var(--s-8); }
+  .issues li { display: grid; gap: var(--s-2); align-content: start; }
+  .issues a { display: grid; gap: var(--s-3); color: inherit; text-decoration: none; }
+  .issues img {
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    border: 1px solid var(--c-rule);
+    box-shadow: 0 8px 20px rgba(21, 34, 47, 0.18);
+    transition: transform 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
   }
-  .stats ul {
-    --auto-grid-min: 200px;
-    --auto-grid-gap: var(--s-6);
-  }
-  .stats li { display: grid; gap: var(--s-1); }
-  .stats .value { font-family: var(--f-display); font-size: var(--t-lg); color: var(--c-ink); }
-  .stats .label { font-size: var(--t-sm); color: var(--c-ink-faint); }
+  .issues a:hover img, .issues a:focus-visible img { transform: translateY(-3px); }
+  .issue-title { font-family: var(--f-display); font-size: var(--t-lg); }
+  .issues a:hover .issue-title { text-decoration: underline; text-underline-offset: 0.2em; }
+  .issue-meta { font-size: var(--t-sm); color: var(--c-ink-soft); }
 
-  .block { padding-block: var(--s-16); display: grid; gap: var(--s-6); }
-
-  .pillars { --auto-grid-min: 240px; }
-  .pillars li { display: grid; gap: var(--s-2); }
-  .pillars h3 { font-size: var(--t-lg); }
-  .pillars p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 40ch; }
-
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-3);
+  .arc {
     list-style: none;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-8);
+    font-family: var(--f-display);
+    font-size: var(--t-xl);
   }
-  .tags li {
-    font-family: var(--f-ui);
-    font-size: var(--t-sm);
-    color: var(--c-ink-soft);
-    border: 1px solid var(--c-rule);
-    border-radius: 999px;
-    padding: var(--s-1) var(--s-4);
+  .arc li + li::before {
+    content: '→';
+    margin-right: var(--s-8);
+    color: var(--c-rust);
   }
+  .weeks { display: grid; grid-template-columns: repeat(10, 1fr); gap: var(--s-2); }
+  .weeks span { height: 8px; background: var(--c-navy); opacity: 0.9; }
+  .weeks span:nth-child(n+4) { opacity: 0.55; }
+  .weeks span:nth-child(n+8) { opacity: 0.3; }
 
-  .testimonials { --auto-grid-min: 260px; }
-  .testimonials li { display: grid; gap: var(--s-2); }
-  .testimonials blockquote {
+  .pillars { --auto-grid-min: 240px; }
+  .pillars li { border-top: 2px solid var(--c-brass); padding-top: var(--s-3); display: grid; gap: var(--s-2); align-content: start; }
+  .pillars p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 40ch; }
+
+  .featured-quote {
     margin: 0;
-    font-family: var(--f-prose);
-    font-style: italic;
-    color: var(--c-ink-soft);
-    padding-left: var(--s-4);
-    border-left: 1px solid var(--c-rule);
-  }
-  .testimonials .who { font-size: var(--t-xs); color: var(--c-ink-faint); }
-
-  .mentor {
-    border-top: 1px solid var(--c-rule);
-    padding-block: var(--s-8) var(--s-16);
     display: grid;
     gap: var(--s-4);
+    max-width: 52ch;
+    padding-bottom: var(--s-8);
   }
-  .mentor h2 { font-size: var(--t-lg); }
+  .featured-quote blockquote {
+    margin: 0;
+    color: var(--c-navy);
+    font-family: var(--f-display);
+    font-size: var(--t-xl);
+    line-height: 1.35;
+    text-wrap: balance;
+    hanging-punctuation: first;
+  }
+  figcaption {
+    font-family: var(--f-ui);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--c-rust);
+  }
+  .quotes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-8) var(--s-12);
+  }
+  .quotes li { border-top: 2px solid var(--c-brass); padding-top: var(--s-4); }
+  .quotes figure { margin: 0; display: grid; gap: var(--s-3); align-content: start; }
+  .quotes blockquote {
+    margin: 0;
+    font-family: var(--f-display);
+    font-size: var(--t-lg);
+    line-height: 1.4;
+    color: var(--c-ink);
+    text-wrap: pretty;
+  }
+  .source { font-size: var(--t-sm); color: var(--c-ink-faint); }
+
+  .join {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    padding-block: var(--s-16);
+    margin-bottom: calc(var(--s-24) * -1); /* cancel the footer's top margin so the bar meets it */
+  }
+  .join-col + .join-col { border-left: 1px solid var(--c-brass); padding-left: var(--s-12); }
+  .join-col:first-child { padding-right: var(--s-12); }
+  .join-col { display: grid; gap: var(--s-6); align-content: start; grid-template-rows: auto 1fr auto; }
+
+  @media (max-width: 720px) {
+    .quotes { grid-template-columns: 1fr; }
+    .join { grid-template-columns: minmax(0, 1fr); gap: var(--s-12); }
+    .join-col + .join-col { border-left: 0; padding-left: 0; border-top: 1px solid var(--c-brass); padding-top: var(--s-12); }
+    .join-col:first-child { padding-right: 0; }
+    .arc { flex-direction: column; gap: var(--s-2); }
+    .arc li + li::before { margin-right: var(--s-3); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .issues img { transition: none; }
+    .issues a:hover img, .issues a:focus-visible img { transform: none; }
+  }
 </style>

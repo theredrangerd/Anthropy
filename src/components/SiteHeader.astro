@@ -16,26 +16,42 @@ const isActive = (href: string) => here.startsWith(href);
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="page-shell bar">
-    <a class="wordmark" href={base}>Anthropy</a>
+    <a class="wordmark" href={base}>Anthropy<span>Student humanities research · UWC South East Asia, Dover</span></a>
     <nav aria-label="Primary">
-      <ul>
-        {links.map((link) => (
-          <li>
-            <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <details class="menu" open>
+        <summary>Menu</summary>
+        <ul>
+          {links.map((link) => (
+            <li>
+              <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+      <script is:inline>
+        // Runs before first paint: the links are always visible when wide, a closed disclosure when narrow.
+        (function () {
+          var menu = document.querySelector('.site-header .menu');
+          var wide = window.matchMedia('(min-width: 901px)');
+          var sync = function () { menu.open = wide.matches; };
+          sync();
+          wide.addEventListener('change', sync);
+          menu.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !wide.matches && menu.open) {
+              menu.open = false;
+              menu.querySelector('summary').focus();
+            }
+          });
+        })();
+      </script>
     </nav>
   </div>
 </header>
 
 <style>
-  .skip {
-    position: absolute;
-    left: -9999px;
-  }
+  .skip { position: absolute; left: -9999px; }
   .skip:focus {
     left: var(--s-4);
     top: var(--s-4);
@@ -44,43 +60,92 @@ const isActive = (href: string) => here.startsWith(href);
     padding: var(--s-2) var(--s-4);
   }
   .site-header {
-    border-bottom: 1px solid var(--c-rule);
-    background: var(--c-ground);
+    background: var(--c-navy);
+    color: var(--c-on-navy);
+    border-bottom: 3px solid var(--c-brass);
   }
   .bar {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: flex-end;
     justify-content: space-between;
-    gap: var(--s-4);
-    padding-block: var(--s-4);
+    gap: var(--s-4) var(--s-8);
+    padding-block: var(--s-6) var(--s-4);
   }
   .wordmark {
+    display: grid;
+    gap: 6px;
     font-family: var(--f-display);
     font-weight: 700;
-    font-size: var(--t-lg);
-    letter-spacing: -0.02em;
+    font-size: 1.9rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
     text-decoration: none;
+    color: var(--c-on-navy);
   }
+  .wordmark span {
+    font-family: var(--f-ui);
+    font-weight: 400;
+    font-size: var(--t-xs);
+    letter-spacing: 0.02em;
+    color: var(--c-on-navy-soft);
+  }
+  .menu summary {
+    display: none;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 44px;
+    padding-inline: var(--s-3);
+    font-size: var(--t-sm);
+    font-weight: 500;
+    color: var(--c-on-navy);
+    cursor: pointer;
+    list-style: none;
+  }
+  .menu summary::-webkit-details-marker { display: none; }
+  .menu summary::after {
+    content: '';
+    width: 0.45em;
+    height: 0.45em;
+    border: solid currentColor;
+    border-width: 0 2px 2px 0;
+    transform: translateY(-0.15em) rotate(45deg);
+    transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .menu[open] summary::after { transform: translateY(0.1em) rotate(-135deg); }
   nav ul {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s-4) var(--s-6);
+    gap: var(--s-2) var(--s-6);
     list-style: none;
     margin: 0;
     padding: 0;
   }
   nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     font-size: var(--t-sm);
-    color: var(--c-ink-soft);
+    font-weight: 500;
+    color: var(--c-on-navy-soft);
     text-decoration: none;
+    border-bottom: 2px solid transparent;
   }
-  nav a:hover { color: var(--c-ink); }
-  nav a[aria-current='page'] {
-    color: var(--c-ink);
-    text-decoration: underline;
-    text-decoration-color: var(--c-sage);
-    text-underline-offset: 0.3em;
+  nav a:hover { color: var(--c-on-navy); }
+  nav a[aria-current='page'] { color: var(--c-on-navy); border-bottom-color: var(--c-brass); }
+  .site-header :focus-visible { outline-color: var(--c-brass); }
+
+  @media (max-width: 900px) {
+    .bar { align-items: center; }
+    nav { margin-left: auto; }
+    nav:has(.menu[open]) { flex-basis: 100%; }
+    .menu summary { display: flex; margin-left: auto; width: fit-content; }
+    nav ul { flex-direction: column; gap: 0; border-top: 1px solid rgb(185 198 211 / 0.25); }
+    nav li + li { border-top: 1px solid rgb(185 198 211 / 0.15); }
+    nav a { display: block; padding-block: var(--s-3); border-bottom: 0; }
+    nav a[aria-current='page'] { text-decoration: underline 2px var(--c-brass); text-underline-offset: 0.35em; }
+  }
+  @media (max-width: 480px) {
+    .wordmark span { display: none; }
   }
 </style>

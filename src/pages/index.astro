@@ -1,10 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ProofBand from '../components/ProofBand.astro';
-import FeaturedItem from '../components/FeaturedItem.astro';
 import RevisionReveal from '../components/RevisionReveal.astro';
-import Timeline from '../components/Timeline.astro';
 import { excludeDrafts, sortByDateDesc, sortByDateAsc } from '../lib/collections';
 import { formatIssueDate, formatEventDate } from '../lib/format';
 import site from '../data/site.json';
@@ -13,211 +10,460 @@ const allArticles = sortByDateDesc(
   excludeDrafts(await getCollection('articles')),
   (a) => a.data.publishedAt,
 );
-const [featuredArticle, ...restArticles] = allArticles;
-const compactArticles = restArticles.slice(0, 3);
+const FEATURED_ID = 'abortion-act-1967-reproductive-autonomy';
+const featuredArticle = allArticles.find((a) => a.id === FEATURED_ID) ?? allArticles[0];
+const rotaryArticles = allArticles.filter((a) => a.id !== featuredArticle?.id);
 
 const allIssues = sortByDateDesc(
   excludeDrafts(await getCollection('journal')),
   (i) => i.data.publishedAt,
 );
-const journalStrip = [...allIssues]
-  .sort((a, b) => a.data.issueNumber - b.data.issueNumber)
-  .map((i) => ({
-  href: `${import.meta.env.BASE_URL}journal/${i.id}/`,
-  title: i.data.title,
-  meta: `Issue ${i.data.issueNumber}`,
-}));
+const [latestIssue, ...earlierIssues] = allIssues;
 
 const upcoming = sortByDateAsc(
   excludeDrafts(await getCollection('events')).filter((e) => e.data.upcoming),
   (e) => e.data.startsAt,
 );
 
-const stats = [
-  ...(allArticles.length > 0
-    ? [{ value: String(allArticles.length), label: allArticles.length === 1 ? 'paper published' : 'papers published' }]
-    : []),
-  ...(allIssues.length > 0
-    ? [{ value: String(allIssues.length), label: allIssues.length === 1 ? 'journal issue' : 'journal issues' }]
-    : []),
-];
+const countWord = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 const base = import.meta.env.BASE_URL;
 ---
 <BaseLayout
   title="Anthropy"
   description="Anthropy is a student-led humanities research organization based at UWC South East Asia's Dover Campus, with international reach. We publish student research and bring academics into conversation with the students who will follow them."
 >
-  <section class="thesis">
-    <p class="eyebrow">Humanities research · UWC Dover, with international reach · Since {site.established}</p>
-    <h1>We do not set out to change the humanities. We set out to prepare the people who will.</h1>
-    <p class="lede">
-      Anthropy runs a research programme, publishes a student academic journal, and brings
-      working academics into direct conversation with secondary students. Everything here is
-      produced by students who were <RevisionReveal from="just interested in" to="learning to do" /> research
-      when they started.
-    </p>
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>We do not set out to change the humanities. We set out to prepare the people who will.</h1>
+      <p class="lede">
+        Anthropy runs a research programme, publishes a student academic journal, and brings
+        working academics into direct conversation with secondary students. Everything here is
+        produced by students who were <RevisionReveal from="just interested in" to="learning to do" /> research
+        when they started.
+      </p>
+      <div class="actions">
+        {latestIssue && (
+          <a class="btn" href={`${base}journal/${latestIssue.id}/`}>Read Issue {latestIssue.data.issueNumber}</a>
+        )}
+        <a class="btn ghost" href={`${base}articles/`}>All published work</a>
+      </div>
+    </div>
+    {latestIssue && (
+      <figure class="hero-cover">
+        <a href={`${base}journal/${latestIssue.id}/`}>
+          <img
+            src={`${base}journal/covers/${latestIssue.id}.png`}
+            alt={`Cover of ${latestIssue.data.title}`}
+            width="990"
+            height="1400"
+            fetchpriority="high"
+          />
+        </a>
+        <figcaption>
+          <strong>{latestIssue.data.title}</strong>
+          <span>{formatIssueDate(latestIssue.data.publishedAt)} · {countWord(allArticles.length, 'paper', 'papers')} published to date</span>
+        </figcaption>
+      </figure>
+    )}
   </section>
 
-  <ProofBand />
+  <section class="block journal band hue" aria-labelledby="journal-h">
+    <header class="block-head">
+      <h2 id="journal-h">The journal</h2>
+      <p>{countWord(allIssues.length, 'Issue', 'Issues')}. Produced through <a href={`${base}in2academia/`}>In2Academia</a>.</p>
+    </header>
+    <ol class="issues">
+      {allIssues.map((i) => (
+        <li class="issue">
+          <a class="issue-cover" href={`${base}journal/${i.id}/`} tabindex="-1" aria-hidden="true">
+            <img src={`${base}journal/covers/${i.id}.png`} alt="" width="990" height="1400" loading="lazy" />
+          </a>
+          <div class="issue-body">
+            <h3><a href={`${base}journal/${i.id}/`}>{i.data.title}</a></h3>
+            <p class="meta">{formatIssueDate(i.data.publishedAt)}</p>
+            <p>{i.data.summary}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
 
-  <section class="block editorial">
-    <h2>Recent work</h2>
-    <div class="editorial-grid">
-      <div class="editorial-main">
-        {featuredArticle ? (
-          <FeaturedItem
-            href={`${base}articles/${featuredArticle.id}/`}
-            eyebrow={`${featuredArticle.data.discipline} · ${formatIssueDate(featuredArticle.data.publishedAt)}`}
-            title={featuredArticle.data.title}
-            summary={featuredArticle.data.summary}
-            badge="Latest"
-            animateSummary
-          />
-        ) : (
-          <p class="empty">The first papers of this cycle are being prepared for publication.</p>
-        )}
-        {journalStrip.length > 0 && (
-          <div class="journal-strip">
-            <h3 class="eyebrow">The journal</h3>
-            <ul class="journal-strip-grid">
-              {journalStrip.map((item) => (
-                <li>
-                  <article>
-                    <p class="eyebrow">{item.meta}</p>
-                    <h4><a href={item.href}>{item.title}</a></h4>
-                  </article>
+  <section class="block papers band gray" aria-labelledby="papers-h">
+    <header class="block-head">
+      <h2 id="papers-h">Published papers</h2>
+      <a class="all-link" href={`${base}articles/`}>All papers →</a>
+    </header>
+    {featuredArticle ? (
+      <div class="papers-grid">
+        <article class="lead-paper">
+          <p class="meta">{featuredArticle.data.discipline} · {featuredArticle.data.author} · {formatIssueDate(featuredArticle.data.publishedAt)}</p>
+          <h3><a href={`${base}articles/${featuredArticle.id}/`}>{featuredArticle.data.title}</a></h3>
+          <p class="summary">{featuredArticle.data.summary}</p>
+          <a class="read-link" href={`${base}articles/${featuredArticle.id}/`}>Read the paper →</a>
+        </article>
+        {rotaryArticles.length > 0 && (
+          <div class="rotary" role="region" aria-roledescription="carousel" aria-label="More published papers" data-rotary>
+            <ol class="rotary-track" tabindex="0" aria-label="Papers">
+              {rotaryArticles.map((a, i) => (
+                <li class="slide" role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${rotaryArticles.length}`}>
+                  <p class="meta">{a.data.discipline} · {a.data.author} · {formatIssueDate(a.data.publishedAt)}</p>
+                  <h4><a href={`${base}articles/${a.id}/`}>{a.data.title}</a></h4>
+                  <p class="slide-summary">{a.data.summary}</p>
                 </li>
               ))}
-            </ul>
+            </ol>
+            <div class="rotary-controls" hidden>
+              <button type="button" class="rc-btn" data-prev aria-label="Previous paper">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="rc-btn" data-next aria-label="Next paper">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="rc-btn" data-toggle aria-label="Pause automatic rotation" aria-pressed="false">
+                <svg class="i-pause" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5.5 3.5v9M10.5 3.5v9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <svg class="i-play" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg>
+              </button>
+              <span class="rc-count" aria-live="off"><span data-index>1</span> / {rotaryArticles.length}</span>
+            </div>
           </div>
         )}
       </div>
-      <div class="editorial-aside">
-        {compactArticles.length > 0 && (
-          <>
-            <h3 class="eyebrow">More recent work</h3>
-            <ul class="compact-list">
-              {compactArticles.map((a) => (
-                <li>
-                  <span class="meta">{formatIssueDate(a.data.publishedAt)}</span>
-                  <a href={`${base}articles/${a.id}/`}>{a.data.title}</a>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+    ) : (
+      <p class="empty">The first papers of this cycle are being prepared for publication.</p>
+    )}
+  </section>
+
+  <section class="block run i2a band lift" aria-labelledby="programmes-h">
+    <h2 id="programmes-h">What we run</h2>
+    <div class="i2a-panel">
+      <div class="i2a-copy">
+        <h3><a href={`${base}in2academia/`}>In2Academia</a></h3>
+        <p class="panel-lede">
+          A ten-week programme teaching secondary students how to actually conduct humanities
+          research, with a mentor beside them from the first question to the last footnote.
+        </p>
+        <ol class="arc" aria-label="What the programme produces">
+          <li>An area of interest</li>
+          <li>A defined research question</li>
+          <li>A finished paper</li>
+        </ol>
+        <a class="panel-link" href={`${base}in2academia/`}>See how the programme works <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="i2a-output">
+        <ol class="shelf" aria-label="Journal issues produced through In2Academia">
+          {[...allIssues].reverse().map((i) => (
+            <li>
+              <a href={`${base}journal/${i.id}/`}>
+                <img src={`${base}journal/covers/${i.id}.webp`} alt={`Cover of ${i.data.title}`} width="990" height="1400" loading="lazy" />
+              </a>
+            </li>
+          ))}
+        </ol>
+        <p class="shelf-note">Every issue of the journal began in this programme.</p>
       </div>
     </div>
   </section>
 
-  <section class="block programmes">
-    <h2>What we run</h2>
-    <div class="tile-pair">
-      <article class="tile-pair-item primary">
-        <h3><a href={`${base}in2academia/`}>In2Academia</a></h3>
-        <p>
-          A ten-week programme teaching secondary students how to actually conduct humanities
-          research — from question to argument to a paper that gets published.
-        </p>
-      </article>
-      <article class="tile-pair-item secondary">
-        <h3><a href={`${base}events/`}>Events</a></h3>
-        <p>
-          Our speaker programme brings researchers and academics in to talk directly with
-          students.
-          {upcoming.length > 0 && (
-            <span> Next: {formatEventDate(upcoming[0].data.startsAt)}.</span>
-          )}
-        </p>
-      </article>
+  <section class="run events" aria-labelledby="events-h" style={`--photo: url(${base}events/hfw-question.jpg)`}>
+    <div class="events-copy">
+      <h3 id="events-h"><a href={`${base}events/`}>Events</a></h3>
+      <p class="panel-lede">
+        Our speaker programme brings researchers and academics into the school library to talk
+        about their work, then answers to the students who put questions to them directly.
+        {upcoming.length > 0 && (
+          <span class="next"> Next: {formatEventDate(upcoming[0].data.startsAt)}.</span>
+        )}
+      </p>
+      <a class="panel-link" href={`${base}events/`}>Humanities Focus, past and present <span aria-hidden="true">→</span></a>
     </div>
   </section>
-
-  <section class="block timeline-section">
-    <h2>Our story so far</h2>
-    <Timeline variant="compact" />
-  </section>
-
-  {stats.length > 0 && (
-    <section class="fact-strip">
-      <ul>
-        {stats.map((s) => (
-          <li>
-            <span class="value">{s.value}</span>
-            <span class="label">{s.label}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
 </BaseLayout>
 
-<style>
-  .thesis {
-    display: grid;
-    gap: var(--s-6);
-    max-width: 640px;
-    padding-block: var(--s-24) var(--s-16);
+<script>
+  const root = document.querySelector<HTMLElement>('[data-rotary]');
+  if (root) {
+    const track = root.querySelector<HTMLElement>('.rotary-track')!;
+    const slides = Array.from(track.children) as HTMLElement[];
+    const controls = root.querySelector<HTMLElement>('.rotary-controls')!;
+    const indexEl = root.querySelector<HTMLElement>('[data-index]')!;
+    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const INTERVAL = 10000;
+    let current = 0;
+    let paused = reduced.matches;
+    let hovering = false;
+    let timer: number | undefined;
+
+    controls.hidden = false;
+
+    const go = (i: number, auto = false) => {
+      current = (i + slides.length) % slides.length;
+      track.scrollTo({ left: slides[current].offsetLeft - track.offsetLeft, behavior: reduced.matches && !auto ? 'auto' : 'smooth' });
+    };
+    const sync = () => {
+      toggle.setAttribute('aria-pressed', String(paused));
+      toggle.setAttribute('aria-label', paused ? 'Resume automatic rotation' : 'Pause automatic rotation');
+      root.classList.toggle('is-paused', paused);
+    };
+    const stop = () => { window.clearInterval(timer); timer = undefined; };
+    const start = () => {
+      stop();
+      if (!paused && !hovering && !document.hidden) timer = window.setInterval(() => go(current + 1, true), INTERVAL);
+    };
+
+    let raf = 0;
+    track.addEventListener('scroll', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const w = slides[0].offsetWidth || 1;
+        current = Math.min(slides.length - 1, Math.round(track.scrollLeft / w));
+        indexEl.textContent = String(current + 1);
+      });
+    }, { passive: true });
+
+    root.querySelector('[data-prev]')!.addEventListener('click', () => { go(current - 1); start(); });
+    root.querySelector('[data-next]')!.addEventListener('click', () => { go(current + 1); start(); });
+    toggle.addEventListener('click', () => { paused = !paused; sync(); start(); });
+    track.addEventListener('mouseenter', () => { hovering = true; stop(); });
+    track.addEventListener('mouseleave', () => { hovering = false; start(); });
+    track.addEventListener('focusin', () => { hovering = true; stop(); });
+    track.addEventListener('focusout', () => { hovering = false; start(); });
+    document.addEventListener('visibilitychange', start);
+    reduced.addEventListener('change', (e) => { if (e.matches) { paused = true; sync(); start(); } });
+
+    sync();
+    start();
   }
-  .thesis h1 { max-width: 18ch; }
+</script>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: var(--s-16);
+    align-items: center;
+    padding-block: var(--s-16);
+  }
+  .hero-copy { display: grid; gap: var(--s-6); }
+  .hero h1 { font-size: clamp(2.1rem, 1.5rem + 2.6vw, 3.5rem); max-width: 20ch; color: var(--c-navy); }
+  .band.hue { --band: #E1EAF3; }
+  .band.gray { --band: #F0F2F4; }
+  .band.pale { --band: var(--c-sage-soft); }
+  .band.warm { --band: var(--c-rust-soft); }
   .lede {
     font-family: var(--f-prose);
     font-size: var(--t-lg);
+    line-height: 1.55;
     color: var(--c-ink-soft);
-    max-width: 52ch;
+    max-width: 54ch;
   }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-4); padding-top: var(--s-2); }
 
-  .block { display: grid; gap: var(--s-6); padding-block: var(--s-16); }
+  .hero-cover { margin: 0; display: grid; gap: var(--s-4); }
+  .hero-cover img {
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(15, 30, 45, 0.18), 0 18px 40px -12px rgba(15, 30, 45, 0.38);
+  }
+  .hero-cover figcaption { display: grid; gap: 2px; font-size: var(--t-sm); color: var(--c-ink-soft); }
+  .hero-cover strong { font-family: var(--f-display); font-size: var(--t-base); color: var(--c-ink); }
 
-  .editorial-grid {
+  .block { display: grid; gap: var(--s-8); padding-block: var(--s-16); margin-top: -1px; }
+  .block-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s-2) var(--s-8); }
+  .block-head p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 52ch; }
+  .block h2 { font-size: var(--t-2xl); color: var(--c-navy); }
+  .meta { font-size: var(--t-sm); color: var(--c-ink-faint); }
+
+  .issues { list-style: none; margin: 0; padding: 0; display: grid; }
+  .issue {
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 120px minmax(0, 1fr);
     gap: var(--s-8);
-    align-items: start;
+    padding-block: var(--s-6);
+    border-top: 1px solid var(--c-rule);
   }
-  .editorial-main { display: grid; gap: var(--s-8); align-content: start; }
-  .editorial-aside { display: grid; gap: var(--s-4); align-content: start; }
-  .journal-strip { display: grid; gap: var(--s-4); }
-  .journal-strip-grid {
+  .issue:first-child { border-top: 0; padding-top: 0; }
+  .issue-cover img { box-shadow: 0 1px 3px rgba(15, 30, 45, 0.25), 0 8px 18px -8px rgba(15, 30, 45, 0.35); }
+  .issue-body { display: grid; gap: var(--s-2); align-content: start; max-width: 62ch; }
+  .issue-body h3 { font-size: var(--t-xl); }
+  .issue-body h3 a, .lead-paper h3 a { text-decoration: none; }
+  .issue-body h3 a:hover, .lead-paper h3 a:hover { text-decoration: underline; text-decoration-color: var(--c-brass); text-underline-offset: 0.2em; }
+  .issue-body p:last-child { font-family: var(--f-prose); color: var(--c-ink-soft); }
+
+  .all-link { font-family: var(--f-ui); font-size: var(--t-sm); font-weight: 500; }
+
+  .papers-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--s-16); align-items: stretch; }
+  .lead-paper { display: grid; gap: var(--s-4); align-content: start; }
+  .lead-paper h3 { font-size: var(--t-2xl); line-height: 1.15; text-wrap: balance; }
+  .summary { font-family: var(--f-prose); font-size: var(--t-lg); line-height: 1.55; color: var(--c-ink-soft); max-width: 58ch; }
+  .read-link { font-family: var(--f-ui); font-size: var(--t-sm); font-weight: 500; justify-self: start; }
+
+  .rotary {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: var(--s-4);
+    min-width: 0;
+    padding: 0 0 0 var(--s-8);
+    border-left: 1px solid var(--c-rule);
+  }
+  .rotary-track {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--s-4);
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    border-radius: 2px;
   }
-  .journal-strip-grid article {
+  .rotary-track::-webkit-scrollbar { display: none; }
+  .slide {
+    scroll-snap-align: start;
     display: grid;
-    gap: var(--s-2);
-    padding-top: var(--s-3);
-    border-top: 1px solid var(--c-rule);
+    gap: var(--s-3);
+    align-content: start;
+    padding-right: var(--s-4);
   }
-  .journal-strip-grid a { text-decoration: none; }
-  .journal-strip-grid a:hover { text-decoration: underline; text-decoration-color: var(--c-sage); }
+  .slide h4 { font-size: var(--t-xl); line-height: 1.2; text-wrap: balance; }
+  .slide h4 a { text-decoration: none; }
+  .slide h4 a:hover { text-decoration: underline; text-decoration-color: var(--c-brass); text-underline-offset: 0.2em; }
+  .slide-summary {
+    font-family: var(--f-prose);
+    color: var(--c-ink-soft);
+  }
 
-  /* Mirrors journal-strip-grid's eyebrow-then-title order, so every title
-     in this section — featured, journal issue, or compact — reads the
-     same way: a small dated label above a serif title. */
-  .compact-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-4); }
-  .compact-list li {
+  .rotary-controls { display: flex; align-items: center; gap: var(--s-2); }
+  .rotary-controls[hidden] { display: none; }
+  .rc-btn {
     display: grid;
-    gap: var(--s-1);
-    border-top: 1px solid var(--c-rule);
-    padding-top: var(--s-3);
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    color: var(--c-navy);
+    background: transparent;
+    border: 1px solid var(--c-rule);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .compact-list a {
-    font-family: var(--f-display);
+  .rc-btn:hover { background: var(--c-sunk); border-color: var(--c-navy-mid); }
+  .rc-btn:active { background: var(--c-sage-soft); }
+  .rc-btn .i-play { display: none; }
+  .is-paused .rc-btn .i-play { display: block; }
+  .is-paused .rc-btn .i-pause { display: none; }
+  .rc-count {
+    margin-left: auto;
+    font-family: var(--f-ui);
+    font-size: var(--t-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--c-ink-faint);
+  }
+
+  .run h3 { font-size: var(--t-3xl); line-height: 1.05; color: var(--c-on-navy); }
+  .run h3 a { text-decoration: none; }
+  .run h3 a:hover { text-decoration: underline; text-decoration-color: var(--c-brass); text-underline-offset: 0.15em; }
+  .run .panel-lede { font-family: var(--f-prose); font-size: var(--t-lg); line-height: 1.55; color: var(--c-on-navy); max-width: 46ch; }
+  .panel-link {
+    justify-self: start;
+    font-family: var(--f-ui);
     font-weight: 600;
-    font-size: var(--t-base);
-    line-height: 1.25;
-    color: var(--c-ink);
-    text-decoration: none;
+    font-size: var(--t-sm);
+    color: var(--c-on-navy);
+    text-decoration: underline;
+    text-decoration-color: var(--c-brass);
+    text-underline-offset: 0.3em;
+    text-decoration-thickness: 1px;
   }
-  .compact-list a:hover { text-decoration: underline; text-decoration-color: var(--c-sage); }
-  .compact-list .meta { font-size: var(--t-xs); color: var(--c-ink-faint); }
+  .panel-link span { display: inline-block; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+  .panel-link:hover span { transform: translateX(4px); }
+  .panel-link:focus-visible { outline: 2px solid var(--c-brass); outline-offset: 4px; }
 
-  @media (max-width: 720px) {
-    .editorial-grid { grid-template-columns: 1fr; }
-    .journal-strip-grid { grid-template-columns: 1fr; }
+  .block.i2a { gap: var(--s-4); padding-bottom: var(--s-24); }
+  .block.i2a h2 { color: var(--c-on-navy-soft); font-size: var(--t-xl); }
+  .i2a-panel { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: var(--s-16); align-items: center; }
+  .i2a-copy { display: grid; gap: var(--s-6); }
+
+  /* The programme's arc as a drawn line: three stages, the last one is the point. */
+  .arc { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; max-width: 30rem; }
+  .arc li {
+    position: relative;
+    padding: var(--s-3) 0 var(--s-3) var(--s-8);
+    font-family: var(--f-ui);
+    font-size: var(--t-base);
+    color: var(--c-on-navy-soft);
+  }
+  .arc li::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    width: 11px;
+    height: 11px;
+    margin-top: -5.5px;
+    border: 1.5px solid var(--c-brass);
+    border-radius: 50%;
+    background: #293F56;
+  }
+  .arc li::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    height: 100%;
+    border-left: 1.5px solid rgb(181 158 127 / 0.55);
+  }
+  .arc li:last-child::after { display: none; }
+  .arc li:last-child { color: var(--c-on-navy); font-weight: 600; }
+  .arc li:last-child::before { background: var(--c-brass); }
+
+  .i2a-output { display: grid; gap: var(--s-4); justify-items: center; }
+  .shelf { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; align-items: flex-end; width: 100%; }
+  .shelf li { flex: 0 1 42%; min-width: 0; margin-inline: -2%; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+  .shelf li:nth-child(1) { transform: translateY(10px); }
+  .shelf li:nth-child(2) { transform: translateY(0); z-index: 1; }
+  .shelf li:nth-child(3) { transform: translateY(-14px); z-index: 2; }
+  .shelf li:hover { transform: translateY(-22px); z-index: 3; }
+  .shelf a { display: block; }
+  .shelf a:focus-visible { outline: 2px solid var(--c-brass); outline-offset: 3px; }
+  .shelf img { display: block; width: 100%; height: auto; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35), 0 22px 36px -14px rgba(0, 0, 0, 0.55); }
+  .shelf-note { font-family: var(--f-ui); font-size: var(--t-sm); color: var(--c-on-navy-soft); }
+
+  /* Events: the same navy, over the photograph of the room it takes place in. */
+  .run.events {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-items: end;
+    min-height: clamp(24rem, 42vw, 32rem);
+    padding-block: var(--s-24) var(--s-16);
+    margin-bottom: calc(var(--s-24) * -1);
+  }
+  .run.events::before {
+    content: '';
+    position: absolute;
+    inset: 0 calc(50% - 50vw);
+    z-index: -1;
+    background:
+      linear-gradient(90deg, rgb(21 34 47 / 0.92) 0%, rgb(21 34 47 / 0.7) 42%, rgb(21 34 47 / 0.15) 100%),
+      var(--photo) 0 28% / 125% auto no-repeat;
+  }
+  .events-copy { display: grid; gap: var(--s-6); max-width: 34rem; }
+  .next { font-family: var(--f-ui); font-size: var(--t-base); font-weight: 600; white-space: nowrap; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: var(--s-12); padding-block: var(--s-12) var(--s-16); }
+    .hero-cover { max-width: 320px; }
+    .papers-grid { grid-template-columns: 1fr; gap: var(--s-8); }
+    .i2a-panel { grid-template-columns: 1fr; gap: var(--s-12); }
+    .shelf { max-width: 26rem; }
+    .run.events::before { background: linear-gradient(0deg, rgb(21 34 47 / 0.94) 0%, rgb(21 34 47 / 0.72) 55%, rgb(21 34 47 / 0.3) 100%), var(--photo) 35% 30% / cover no-repeat; }
+    .run h3 { font-size: var(--t-2xl); }
+    .rotary { grid-template-rows: auto auto; padding: var(--s-6) 0 0; border-left: 0; border-top: 1px solid var(--c-rule); }
+  }
+  @media (max-width: 520px) {
+    .issue { grid-template-columns: 84px minmax(0, 1fr); gap: var(--s-4); }
   }
 </style>

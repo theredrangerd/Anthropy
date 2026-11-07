@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('journal index renders content or an honest empty state', async ({ page }) => {
   await page.goto('/journal/');
-  await expect(page.locator('h1')).toContainText('Academic Journal');
+  await expect(page.locator('h1')).toContainText('The Anthropy Review');
   const count = await page.locator('.grid li, .empty').count();
   expect(count).toBeGreaterThan(0);
 });

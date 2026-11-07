@@ -1,0 +1,120 @@
+---
+interface Props {
+  src: string;
+  title: string;
+  cover?: string;
+  downloadHref?: string;
+}
+const { src, title, cover, downloadHref } = Astro.props;
+---
+<div class="pdf-pages" data-src={src} role="document" aria-label={title}>
+  <div class="status" role="status">
+    {cover && <img src={cover} alt="" width="600" height="849" />}
+    <p class="msg">Loading the issue…</p>
+  </div>
+</div>
+
+<script>
+  import * as pdfjs from 'pdfjs-dist';
+  import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+
+  const root = document.querySelector<HTMLElement>('.pdf-pages');
+  const status = root?.querySelector<HTMLElement>('.status');
+  const msg = root?.querySelector<HTMLElement>('.msg');
+
+  async function mount(root: HTMLElement) {
+    const doc = await pdfjs.getDocument(root.dataset.src!).promise;
+    const first = await doc.getPage(1);
+    const base = first.getViewport({ scale: 1 });
+    status?.remove();
+
+    const render = async (slot: HTMLElement, n: number) => {
+      const page = await doc.getPage(n);
+      const cssWidth = slot.clientWidth;
+      const scale = cssWidth / page.getViewport({ scale: 1 }).width;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const viewport = page.getViewport({ scale: scale * dpr });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.setAttribute('aria-label', `Page ${n} of ${doc.numPages}`);
+      await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
+      slot.replaceChildren(canvas);
+      slot.dataset.rendered = 'true';
+    };
+
+    const seen = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const slot = e.target as HTMLElement;
+          seen.unobserve(slot);
+          void render(slot, Number(slot.dataset.page));
+        }
+      },
+      { root: root, rootMargin: '1200px 0px' },
+    );
+
+    for (let n = 1; n <= doc.numPages; n++) {
+      const slot = document.createElement('div');
+      slot.className = 'page';
+      slot.dataset.page = String(n);
+      slot.style.aspectRatio = `${base.width} / ${base.height}`;
+      root.append(slot);
+      seen.observe(slot);
+    }
+  }
+
+  if (root) {
+    mount(root).catch(() => {
+      if (status && msg) {
+        status.dataset.failed = 'true';
+        msg.textContent = 'The issue could not be displayed here. Use the download button to read it.';
+      }
+    });
+  }
+</script>
+
+<style>
+  .pdf-pages {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--s-8) var(--s-6);
+    /* Pages dissolve into the backdrop at the top and bottom edges instead of clipping. */
+    --fade: var(--s-8);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%);
+    display: grid;
+    align-content: start;
+    gap: var(--s-4);
+    scrollbar-color: var(--c-ink-faint) transparent;
+  }
+  /* The cover holds the page's place until the first render lands. */
+  .status {
+    position: relative;
+    aspect-ratio: 990 / 1400;
+    background: var(--c-surface);
+    box-shadow: 0 1px 2px rgb(21 34 47 / 0.12), 0 6px 18px rgb(21 34 47 / 0.1);
+  }
+  .status img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .msg {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: var(--s-3) var(--s-4);
+    text-align: center;
+    font-size: var(--t-sm);
+    color: var(--c-on-navy);
+    background: rgb(31 51 71 / 0.88);
+  }
+  .status[data-failed] { aspect-ratio: auto; box-shadow: none; background: transparent; }
+  .status[data-failed] img { display: none; }
+  .status[data-failed] .msg { position: static; color: var(--c-ink-soft); background: transparent; padding: var(--s-6); }
+  .pdf-pages :global(.page) {
+    background: var(--c-surface);
+    box-shadow: 0 1px 2px rgb(21 34 47 / 0.12), 0 6px 18px rgb(21 34 47 / 0.1);
+    width: 100%;
+  }
+  .pdf-pages :global(canvas) { width: 100%; height: 100%; display: block; }
+</style>

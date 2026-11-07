@@ -1,11 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import CollectionGrid from '../../components/CollectionGrid.astro';
-import FeaturedItem from '../../components/FeaturedItem.astro';
+import IssueCard from '../../components/IssueCard.astro';
 import { excludeDrafts, sortByDateDesc } from '../../lib/collections';
 import { formatIssueDate } from '../../lib/format';
 
+const base = import.meta.env.BASE_URL;
 const issues = sortByDateDesc(
   excludeDrafts(await getCollection('journal')),
   (i) => i.data.publishedAt,
@@ -13,52 +13,133 @@ const issues = sortByDateDesc(
 
 const [featured, ...rest] = issues;
 
-const items = rest.map((i) => ({
-  href: `${import.meta.env.BASE_URL}journal/${i.id}/`,
+const card = (i: (typeof issues)[number]) => ({
+  href: `${base}journal/${i.id}/`,
   title: i.data.title,
   meta: `Issue ${i.data.issueNumber} · ${formatIssueDate(i.data.publishedAt)}`,
+  year: i.data.publishedAt.getUTCFullYear(),
   summary: i.data.summary,
-}));
+  cover: i.data.cover,
+  pdf: i.data.pdf,
+  paperTitles: i.data.papers.map((p) => p.title),
+});
 ---
 <BaseLayout
-  title="Journal"
-  description="The Anthropy Academic Journal collects research by secondary students, edited with academic mentors."
+  title="The Anthropy Review"
+  description="The Anthropy Review collects research by secondary students, written through In2Academia and edited with academic mentors."
 >
-  <section class="head">
-    <p class="eyebrow">Publication</p>
-    <h1>The Anthropy Academic Journal</h1>
+  <section class="head band lift">
+    <h1>The Anthropy Review</h1>
     <p class="lede">
       Each issue collects research written by students in the In2Academia programme and
       edited with academic mentors.
     </p>
   </section>
 
-  <section class="block">
-    <h2>Latest issue</h2>
+  <section class="block latest band pale" aria-labelledby="latest-h">
+    <h2 id="latest-h">Latest issue</h2>
     {featured ? (
-      <FeaturedItem
-        href={`${import.meta.env.BASE_URL}journal/${featured.id}/`}
-        eyebrow={`Issue ${featured.data.issueNumber} · ${formatIssueDate(featured.data.publishedAt)}`}
-        title={featured.data.title}
-        summary={featured.data.summary}
-        badge="Latest issue"
-      />
+      <IssueCard {...card(featured)} featured />
     ) : (
       <p class="empty">The inaugural issue is in preparation. Check back, or write to us if you would like to contribute.</p>
     )}
   </section>
 
-  <section class="block">
-    <h2>Earlier issues</h2>
-    <CollectionGrid
-      items={items}
-      emptyMessage="No earlier issues yet."
-    />
+  <section class="block" aria-labelledby="earlier-h">
+    <h2 id="earlier-h">Earlier issues</h2>
+    {rest.length > 0 ? (
+      <ul class="grid">
+        {rest.map((i) => <li><IssueCard {...card(i)} /></li>)}
+      </ul>
+    ) : (
+      <p class="empty">No earlier issues yet.</p>
+    )}
+  </section>
+
+  <section class="join band lift" aria-labelledby="join-h">
+    <h2 id="join-h">Write for the next issue</h2>
+    <div class="join-body">
+      <p>
+        Every paper in the Review began in In2Academia, where each student works with an academic
+        mentor through a series of sessions. Strong papers are considered for the journal and the
+        website archive.
+      </p>
+      <a class="cta" href={`${base}in2academia/`}>Join In2Academia</a>
+    </div>
   </section>
 </BaseLayout>
 
 <style>
-  .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
-  .lede { font-family: var(--f-prose); font-size: var(--t-lg); color: var(--c-ink-soft); max-width: 52ch; }
-  .block { display: grid; gap: var(--s-6); padding-block: var(--s-8); }
+  .head { display: grid; gap: var(--s-4); padding-block: var(--s-16); }
+  .head h1 { color: var(--c-on-navy); }
+  .lede {
+    font-family: var(--f-prose);
+    font-size: var(--t-lg);
+    color: var(--c-on-navy-soft);
+    max-width: 52ch;
+    text-wrap: pretty;
+  }
+  .band.pale { --band: var(--c-sage-soft); }
+  .block { display: grid; gap: var(--s-6); padding-block: var(--s-12); }
+  /* 1px overlap hides the sub-pixel seam between full-bleed bands. */
+  .latest { margin-top: -1px; padding-block: calc(var(--s-12) + 1px) var(--s-16); }
+  /* Section heads label a list; they must never outrank the issue titles beneath. */
+  .block > h2 {
+    font-family: var(--f-ui);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--c-ink-soft);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--c-rule);
+  }
+  .latest > h2 { border-top-color: #C4D0DC; }
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--s-12) var(--s-8);
+  }
+
+  /* The closing call to action: its own full-width bar, flush against the footer. */
+  .join {
+    display: grid;
+    gap: var(--s-8);
+    padding-block: var(--s-24);
+    margin: -1px 0 calc(var(--s-24) * -1);
+    color: var(--c-on-navy);
+  }
+  .join h2 {
+    color: var(--c-on-navy);
+    font-size: clamp(2rem, 6vw, var(--t-3xl));
+    text-wrap: balance;
+  }
+  .join-body { display: grid; gap: var(--s-8); justify-items: start; align-content: start; }
+  .join p {
+    font-family: var(--f-prose);
+    font-size: var(--t-lg);
+    color: var(--c-on-navy-soft);
+    max-width: 52ch;
+    text-wrap: pretty;
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 52px;
+    padding-inline: var(--s-8);
+    font-family: var(--f-ui);
+    font-size: var(--t-base);
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--c-navy);
+    background: var(--c-brass);
+    transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cta:hover { background: #C7B499; }
+  .cta:focus-visible { outline: 2px solid var(--c-brass); outline-offset: 3px; }
+  @media (min-width: 901px) {
+    .join { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-16); align-items: center; }
+  }
 </style>
