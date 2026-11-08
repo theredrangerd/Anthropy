@@ -8,3 +8,7 @@ playwright-report/
 
 .impeccable/
 .playwright-mcp/
+resources/brand-resources/
+resources/HFW/
+resources/session-images/
+/*.png

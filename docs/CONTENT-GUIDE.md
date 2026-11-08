@@ -30,7 +30,8 @@ valuable thing on the site and the easiest to discredit.
 | Articles and papers | files in `src/content/articles/` |
 | Events (Humanities Focus) | files in `src/content/events/` |
 | Leadership team, by year | files in `src/content/leadership/` |
-| About page wording | `src/pages/about.astro` |
+| About page wording (banner line, opening paragraphs, "What we do") | `src/pages/about.astro` |
+| About page photos (poster emblem, workshop, forum) | `public/about/` — keep the same file names, or update the paths in `about.astro` |
 | In2Academia page wording | `src/pages/in2academia.astro` |
 
 ## Adding a new article
