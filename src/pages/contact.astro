@@ -4,65 +4,136 @@ import site from '../data/site.json';
 
 const hasEmail = !site.contactEmail.startsWith('REPLACE_WITH');
 const socials = site.socials.filter((s) => !s.url.startsWith('REPLACE_WITH'));
+
+const mailto = (subject: string) =>
+  `mailto:${site.contactEmail}?subject=${encodeURIComponent(subject)}`;
+
+const routes = [
+  {
+    title: 'Speaking with us',
+    body: 'If you are a researcher or academic interested in speaking at Humanities Focus, write to us. Tell us your name, your institution, and roughly what you work on, and we will reply with the format and dates.',
+    action: 'Write about speaking',
+    subject: 'Speaking at Humanities Focus',
+  },
+  {
+    title: 'Joining In2Academia',
+    body: 'Students who want to hear when the next In2Academia cycle opens can write to us. Tell us your name and year group, and we will send the dates once they are set.',
+    action: 'Ask about In2Academia',
+    subject: 'In2Academia',
+  },
+  {
+    title: 'Everything else',
+    body: 'Teachers, schools, and anyone curious about what we do: write to us with your question, and the name of your school if it is relevant.',
+    action: 'Send a question',
+    subject: 'Question for Anthropy',
+  },
+];
 ---
 <BaseLayout
   title="Contact"
-  description="Get in touch with Anthropy — for speaking, for joining In2Academia, or for anything else."
+  description="Write to Anthropy, the student-led humanities research organization at UWC South East Asia, Dover Campus: about speaking at Humanities Focus, joining In2Academia, or anything else."
 >
-  <section class="head">
-    <p class="eyebrow">Contact</p>
-    <h1>Get in touch</h1>
+  <section class="masthead band lift">
+    <div class="masthead-title">
+      <h1>Write to Anthropy</h1>
+      <p class="statement">Tell us who you are and what you are asking, and we will write back.</p>
+    </div>
+    <dl class="masthead-facts">
+      <div>
+        <dt>Email</dt>
+        <dd>
+          {hasEmail ? (
+            <a class="email" href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>
+          ) : (
+            <span class="empty">Contact details are being finalised.</span>
+          )}
+        </dd>
+      </div>
+      <div><dt>Based at</dt><dd>{site.basedAt}</dd></div>
+      {socials.map((s) => (
+        <div><dt>Also on</dt><dd><a class="social" href={s.url}>{s.label}</a></dd></div>
+      ))}
+    </dl>
   </section>
 
-  <div class="routes auto-grid">
-    <article>
-      <h2>Speaking with us</h2>
-      <p>
-        If you are a researcher or academic interested in speaking at Humanities Focus, we
-        would like to hear from you. Tell us roughly what you work on — we will handle the
-        rest.
-      </p>
-    </article>
-    <article>
-      <h2>Joining In2Academia</h2>
-      <p>
-        Students who want to know when the next programme cycle opens can write to us
-        directly and we will let you know when it does.
-      </p>
-    </article>
-    <article>
-      <h2>Everything else</h2>
-      <p>Questions from teachers, schools, and anyone curious about what we do.</p>
-    </article>
-  </div>
-
-  <div class="how">
-    <p class="eyebrow">Reach us directly</p>
-    {hasEmail ? (
-      <p class="email"><a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a></p>
-    ) : (
-      <p class="empty">Contact details are being finalised.</p>
-    )}
-    {socials.length > 0 && (
-      <ul class="socials">
-        {socials.map((s) => <li><a href={s.url}>{s.label}</a></li>)}
-      </ul>
-    )}
-  </div>
+  <section class="routes" aria-label="Ways to get in touch">
+    {routes.map((r) => (
+      <article>
+        <h2>{r.title}</h2>
+        <p>{r.body}</p>
+        {hasEmail && <a class="route-link" href={mailto(r.subject)}>{r.action}</a>}
+      </article>
+    ))}
+  </section>
 </BaseLayout>
 
 <style>
-  .head { display: grid; gap: var(--s-4); padding-block: var(--s-16) var(--s-8); }
-  .routes {
-    --auto-grid-min: 280px;
-    padding-block: var(--s-8);
+  .band.lift a { color: var(--c-on-navy); text-decoration-color: var(--c-brass); }
+  .band.lift a:hover { color: var(--c-brass); }
+  .band.lift :focus-visible { outline-color: var(--c-brass); }
+
+  .masthead {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: var(--s-12);
+    align-items: end;
+    padding-block: var(--s-16) var(--s-12);
   }
-  .routes article { display: grid; gap: var(--s-2); }
+  .masthead-title { display: grid; gap: var(--s-6); }
+  .masthead h1 { font-size: clamp(2.4rem, 9vw, 4.5rem); overflow-wrap: anywhere; }
+  .statement {
+    font-family: var(--f-display);
+    font-size: var(--t-xl);
+    line-height: 1.3;
+    max-width: 24ch;
+    color: var(--c-on-navy-soft);
+    text-wrap: balance;
+  }
+  .masthead-facts { margin: 0; display: grid; gap: var(--s-6); min-width: 0; }
+  .masthead-facts > div { border-top: 1px solid var(--c-brass); padding-top: var(--s-3); display: grid; gap: var(--s-1); min-width: 0; }
+  .masthead-facts dt {
+    font-size: var(--t-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-on-navy-soft);
+  }
+  .masthead-facts dd { margin: 0; font-family: var(--f-display); font-size: var(--t-lg); }
+  .email {
+    font-size: clamp(1.1rem, 5vw, 1.5rem);
+    overflow-wrap: anywhere;
+    display: inline-block;
+    padding-block: var(--s-1);
+  }
+  .social { display: inline-flex; align-items: center; min-height: 44px; }
+  .empty { font-style: italic; color: var(--c-on-navy-soft); }
+
+  .routes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: var(--s-12);
+    padding-block: var(--s-16);
+  }
+  .routes article {
+    display: grid;
+    gap: var(--s-3);
+    grid-template-rows: auto 1fr auto;
+    border-top: 2px solid var(--c-brass);
+    padding-top: var(--s-4);
+  }
   .routes h2 { font-size: var(--t-lg); }
-  .routes p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 40ch; }
-  .how { padding-block: var(--s-16); display: grid; gap: var(--s-3); border-top: 1px solid var(--c-rule); }
-  .email { font-family: var(--f-display); font-size: var(--t-2xl); }
-  .socials { display: flex; gap: var(--s-6); list-style: none; margin: var(--s-2) 0 0; padding: 0; }
-  .socials a { font-family: var(--f-ui); font-size: var(--t-sm); text-transform: uppercase; letter-spacing: 0.05em; }
-  .empty { font-family: var(--f-prose); font-style: italic; color: var(--c-ink-faint); }
+  .routes p { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 40ch; text-wrap: pretty; }
+  .route-link {
+    font-family: var(--f-ui);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    justify-self: start;
+  }
+
+  @media (max-width: 720px) {
+    .masthead { grid-template-columns: minmax(0, 1fr); gap: var(--s-8); padding-block: var(--s-12) var(--s-8); }
+    .routes { gap: var(--s-8); padding-block: var(--s-12); }
+  }
 </style>

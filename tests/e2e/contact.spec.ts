@@ -6,7 +6,7 @@ test('contact email, when configured, is styled larger than body text', async ({
   test.skip(hasEmail === 0, 'contact email not configured in site.json yet');
   const emailSize = await page.locator('.email').evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
   const bodySize = await page.evaluate(() => parseFloat(getComputedStyle(document.body).fontSize));
-  expect(emailSize).toBeGreaterThan(bodySize * 1.5);
+  expect(emailSize).toBeGreaterThan(bodySize * 1.25);
 });
 
 test('contact page falls back to an honest empty state when no email is configured', async ({ page }) => {
