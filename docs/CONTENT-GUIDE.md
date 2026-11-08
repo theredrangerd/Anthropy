@@ -116,7 +116,7 @@ members:
   - name: "Full Name"
     role: "Chair"
     campus: "UWC Dover"
-    bio: "One or two sentences. Optional."
+    bio: "One or two sentences. Optional. Link with [text](url); site pages start with /."
   - name: "Full Name"
     role: "Head of Operations"
     campus: "UWC Dover"

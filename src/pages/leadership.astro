@@ -20,6 +20,19 @@ const mentors = inTier('mentor');
 // stub is a note to the editors, not copy for readers.
 const bioOf = (bio?: string) =>
   bio?.replace(/\s*A fuller bio is on its way\.?\s*$/, '').trim() || undefined;
+
+// Bios may carry [text](url) links: site-relative paths get the base path,
+// everything else is escaped and left as written.
+const esc = (t: string) =>
+  t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const bioHtml = (bio?: string) => {
+  const text = bioOf(bio);
+  if (!text) return undefined;
+  return esc(text).replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, label, href) => {
+    const url = href.startsWith('/') ? `${base}${href.replace(/^\//, '')}` : href;
+    return `<a href="${url}">${label}</a>`;
+  });
+};
 ---
 <BaseLayout
   title="Leadership"
@@ -40,7 +53,7 @@ const bioOf = (bio?: string) =>
       <ul class="chairs">
         {leads.map((m) => (
           <li class="chair">
-            <figure class="plate">
+            <figure class={m.photo ? 'plate' : 'plate empty-plate'}>
               {m.photo ? (
                 <img
                   src={`${base}${m.photo.replace(/^\//, '')}`}
@@ -55,9 +68,9 @@ const bioOf = (bio?: string) =>
               )}
             </figure>
             <div class="chair-text">
-              <p class="chair-name">{m.name}</p>
-              <p class="chair-role">{m.role}</p>
-              {bioOf(m.bio) && <p class="chair-bio">{bioOf(m.bio)}</p>}
+              <h2 class="chair-name">{m.name}</h2>
+              <p class="role">{m.role}</p>
+              {bioHtml(m.bio) && <p class="chair-bio" set:html={bioHtml(m.bio)} />}
             </div>
           </li>
         ))}
@@ -86,7 +99,7 @@ const bioOf = (bio?: string) =>
       <ul class="people heads">
         {core.map((m) => (
           <li class="head">
-            <figure class="plate">
+            <figure class={m.photo ? 'plate' : 'plate empty-plate'}>
               {m.photo ? (
                 <img
                   src={`${base}${m.photo.replace(/^\//, '')}`}
@@ -101,9 +114,9 @@ const bioOf = (bio?: string) =>
               )}
             </figure>
             <div class="head-text">
-              <p class="head-name">{m.name}</p>
+              <h3 class="head-name">{m.name}</h3>
               <p class="role">{m.role}</p>
-              {bioOf(m.bio) && <p class="bio">{bioOf(m.bio)}</p>}
+              {bioHtml(m.bio) && <p class="bio" set:html={bioHtml(m.bio)} />}
             </div>
           </li>
         ))}
@@ -117,7 +130,7 @@ const bioOf = (bio?: string) =>
       <ul class="people plates">
         {mentors.map((m) => (
           <li class="mentor">
-            <figure class="plate">
+            <figure class={m.photo ? 'plate' : 'plate empty-plate'}>
               {m.photo ? (
                 <img
                   src={`${base}${m.photo.replace(/^\//, '')}`}
@@ -131,9 +144,9 @@ const bioOf = (bio?: string) =>
                 <span class="initial" aria-hidden="true">{m.name.charAt(0)}</span>
               )}
             </figure>
-            <p class="mentor-name">{m.name}</p>
+            <h3 class="mentor-name">{m.name}</h3>
             <p class="role">{m.role}</p>
-            {bioOf(m.bio) && <p class="bio">{bioOf(m.bio)}</p>}
+            {bioHtml(m.bio) && <p class="bio" set:html={bioHtml(m.bio)} />}
           </li>
         ))}
       </ul>
@@ -163,20 +176,10 @@ const bioOf = (bio?: string) =>
 <style>
   .band.slate { --band: var(--c-sage-soft); }
 
-  /* The masthead is the page's statement: the co-chairs sit on the navy, set
-     at the scale a journal gives its editors. */
-  .masthead {
-    --wide: min(1320px, 100vw - 3rem);
-    display: grid;
-    gap: var(--s-16);
-    padding-block: var(--s-16) var(--s-24);
-  }
-  /* The masthead's content breaks out of the page column so the co-chairs
-     can use the width of the screen. */
-  .masthead > * {
-    width: var(--wide);
-    margin-left: calc(50% - var(--wide) / 2);
-  }
+  /* Photo size follows tier: chairs, then heads, then mentors. */
+  :global(:root) { --photo-chair: 15rem; --photo-head: 11rem; --photo-mentor: 9.5rem; }
+
+  .masthead { display: grid; gap: var(--s-16); padding-block: var(--s-16) var(--s-24); }
   .masthead-head {
     display: grid;
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
@@ -199,20 +202,17 @@ const bioOf = (bio?: string) =>
   }
   .year-note { font-size: var(--t-sm); color: var(--c-on-navy-soft); max-width: 34ch; }
 
-  /* Co-chairs: one ruled row each, portrait on the left, name over bio on
-     the right. */
-  .chairs {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--s-12);
-  }
+  /* One role voice across the page: Caslon italic, sentence case. */
+  .role { font-family: var(--f-display); font-style: italic; font-size: var(--t-base); color: var(--c-ink-soft); }
+  .band.lift .role { color: var(--c-brass); font-size: var(--t-lg); }
+
+  /* Co-chairs: one ruled row each, portrait left, name over bio right. */
+  .chairs { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-12); }
   .chair {
     position: relative;
     display: grid;
-    grid-template-columns: clamp(11rem, 26%, 22rem) minmax(0, 1fr);
-    column-gap: clamp(var(--s-8), 4vw, var(--s-16));
+    grid-template-columns: var(--photo-chair) minmax(0, 1fr);
+    column-gap: var(--s-12);
     align-items: start;
     padding-top: var(--s-8);
   }
@@ -226,45 +226,56 @@ const bioOf = (bio?: string) =>
     animation: rule-draw 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .chair:nth-child(2)::before { animation-delay: 140ms; }
-  .chair .plate {
-    width: 100%;
-    margin: 0;
-    background: var(--c-navy);
-    box-shadow: 0 0 0 1px rgb(181 158 127 / 0.4);
-  }
-  .chair .plate .initial { font-size: clamp(4rem, 8vw, 7rem); }
   .chair-text { display: grid; gap: var(--s-4); align-content: start; }
   .chair-name {
-    font-family: var(--f-display);
-    font-weight: 700;
-    font-size: clamp(2.2rem, 1.2rem + 3.4vw, 4rem);
+    font-size: clamp(2.2rem, 1.4rem + 3vw, 3.6rem);
     line-height: 1.04;
     letter-spacing: -0.015em;
     color: var(--c-on-navy);
     animation: name-rise 800ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
   }
   .chair:nth-child(2) .chair-name { animation-delay: 260ms; }
-  .chair-role {
-    font-family: var(--f-display);
-    font-style: italic;
-    font-size: var(--t-lg);
-    color: var(--c-brass);
-    margin-top: calc(var(--s-2) * -1);
-  }
-  /* Two columns of ~60 characters each: the width is used without a line
-     that runs the length of the screen. */
+  .chair-text .role { margin-top: calc(var(--s-2) * -1); }
+  /* Two columns of about 50 characters. */
   .chair-bio {
     font-family: var(--f-prose);
-    font-size: 1.08rem;
+    font-size: 1.05rem;
     line-height: 1.7;
     color: var(--c-on-navy-soft);
-    column-width: 26rem;
+    column-width: 21rem;
     column-gap: var(--s-12);
     padding-top: var(--s-6);
     border-top: 1px solid rgb(181 158 127 / 0.35);
   }
+  .chair-bio :global(a) { color: var(--c-on-navy); text-decoration-color: var(--c-brass); text-decoration-thickness: 1px; }
+  .chair-bio :global(a:hover) { text-decoration-color: var(--c-on-navy); }
+  .chair-bio :global(a:focus-visible) { outline-color: var(--c-brass); }
   @keyframes rule-draw { from { transform: scaleX(0); } }
   @keyframes name-rise { from { opacity: 0; transform: translateY(14px); } }
+
+  /* Plates share one shape; the missing-photo variant is quiet, not a block. */
+  .plate {
+    margin: 0;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--c-navy);
+    display: grid;
+    grid-template: 100% / 100%;
+    place-items: center;
+  }
+  .plate img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 400ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .plate .initial { font-family: var(--f-display); font-weight: 700; line-height: 1; color: var(--c-brass); font-size: 3rem; }
+  .plate.empty-plate { background: transparent; box-shadow: inset 0 0 0 1px var(--c-rule); }
+  .plate.empty-plate .initial { color: var(--c-brass); font-weight: 400; opacity: 0.8; }
+  .chair .plate { width: var(--photo-chair); box-shadow: 0 0 0 1px rgb(181 158 127 / 0.4); }
+  .chair .plate.empty-plate { background: rgb(255 255 255 / 0.04); box-shadow: inset 0 0 0 1px rgb(181 158 127 / 0.4); }
+  .chair .plate .initial { font-size: 5rem; }
+  .head .plate .initial { font-size: 3.4rem; }
 
   .years ul {
     display: flex;
@@ -281,59 +292,78 @@ const bioOf = (bio?: string) =>
   .empty { font-family: var(--f-prose); font-style: italic; color: var(--c-ink-faint); padding-block: var(--s-8); }
 
   .people { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-12); }
-  .role {
-    font-size: var(--t-xs);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--c-ink-faint);
-  }
-  .bio { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 44ch; }
+  .bio { font-family: var(--f-prose); color: var(--c-ink-soft); max-width: 46ch; }
+  .bio :global(a) { color: var(--c-navy); }
 
-  /* Heads: the same ruled column the About page gives each programme. */
+  /* Heads: ruled column, mid-size portrait. */
   .heads { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); }
   .head {
     display: grid;
-    grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+    grid-template-columns: var(--photo-head) minmax(0, 1fr);
     gap: var(--s-6);
     align-items: start;
     border-top: 2px solid var(--c-brass);
     padding-top: var(--s-4);
   }
-  .head .plate { margin: 0; }
-  .head .plate .initial { font-size: 4.5rem; }
+  .head .plate { width: var(--photo-head); }
   .head-text { display: grid; gap: var(--s-2); align-content: start; }
-  .head-name { font-family: var(--f-display); font-weight: 700; font-size: var(--t-2xl); line-height: 1.1; color: var(--c-navy); }
+  .head-name { font-size: var(--t-2xl); line-height: 1.1; color: var(--c-navy); }
   .head .bio { margin-top: var(--s-2); }
 
-  /* Mentors: square-cornered plates, as the journal prints its contributors. */
+  /* Mentors: the smallest portraits, three across. */
   .mentors { margin-top: var(--s-8); margin-bottom: calc(var(--s-24) * -1); }
-  .plates { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-8); }
+  .plates { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-12) var(--s-8); }
   .mentor { display: grid; gap: var(--s-2); align-content: start; }
-  .plate {
-    margin: 0 0 var(--s-3);
-    aspect-ratio: 4 / 5;
-    overflow: hidden;
-    background: var(--c-navy);
+  /* Printed-plate treatment: a white mat, a hairline brass keyline inside it,
+     and a faint navy grade over the photo so four different backdrops sit
+     together as one set. */
+  .mentor .plate {
+    --mat: 0.45rem;
+    position: relative;
+    width: var(--photo-mentor);
+    margin-bottom: var(--s-3);
+    padding: var(--mat);
+    box-sizing: content-box;
+    aspect-ratio: auto;
+    background: var(--c-surface);
+    box-shadow: 0 1px 2px rgb(21 34 47 / 0.14), 0 14px 24px -14px rgb(21 34 47 / 0.4);
+    grid-template: none;
+    place-items: stretch;
+    overflow: visible;
+  }
+  .mentor .plate img,
+  .mentor .plate .initial { aspect-ratio: 4 / 5; width: 100%; height: auto; display: block; }
+  .mentor .plate.empty-plate { background: var(--c-surface); box-shadow: 0 1px 2px rgb(21 34 47 / 0.14), 0 14px 24px -14px rgb(21 34 47 / 0.4); }
+  .mentor .plate .initial {
     display: grid;
-    grid-template: 100% / 100%;
     place-items: center;
+    background: var(--c-sunk);
+    font-size: 2.6rem;
   }
-  .plate img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 400ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  .mentor .plate::before {
+    content: '';
+    position: absolute;
+    inset: var(--mat);
+    z-index: 1;
+    pointer-events: none;
+    background: var(--c-navy);
+    mix-blend-mode: soft-light;
+    opacity: 0.1;
   }
-  .mentor:hover .plate img, .head:hover .plate img { transform: scale(1.03); }
-  .plate .initial {
-    font-family: var(--f-display);
-    font-weight: 700;
-    font-size: 7rem;
-    line-height: 1;
-    color: var(--c-brass);
+  .mentor .plate::after {
+    content: '';
+    position: absolute;
+    inset: calc(var(--mat) + 5px);
+    z-index: 2;
+    pointer-events: none;
+    border: 1px solid rgb(255 255 255 / 0.45);
   }
-  .mentor-name { font-family: var(--f-display); font-weight: 700; font-size: var(--t-xl); line-height: 1.15; color: var(--c-navy); }
+  .mentor .plate .initial + * { display: none; }
+  .mentor-name { font-size: var(--t-xl); line-height: 1.15; color: var(--c-navy); }
   .mentor .bio { font-size: var(--t-sm); margin-top: var(--s-2); }
+  .head:hover .plate img { transform: scale(1.03); }
+  .mentor .plate { overflow: hidden; }
+  .mentor:hover .plate img { transform: scale(1.03); }
 
   /* Past years: a ruled roll, name left, role right. */
   .roll { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--c-brass); }
@@ -352,16 +382,16 @@ const bioOf = (bio?: string) =>
   @media (max-width: 860px) {
     .masthead { gap: var(--s-12); padding-block: var(--s-12); }
     .masthead-head { grid-template-columns: minmax(0, 1fr); gap: var(--s-8); }
-    .chair { grid-template-columns: minmax(0, 10rem) minmax(0, 1fr); column-gap: var(--s-8); }
+    :global(:root) { --photo-chair: 10rem; --photo-head: 8rem; }
+    .chair { column-gap: var(--s-8); }
+    .heads { grid-template-columns: minmax(0, 1fr); }
     .plates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 620px) {
-    .heads, .plates { grid-template-columns: minmax(0, 1fr); }
+    :global(:root) { --photo-chair: 11rem; --photo-head: 7rem; }
     .chair { grid-template-columns: minmax(0, 1fr); row-gap: var(--s-6); }
-    .chair .plate { max-width: 12rem; }
     .chair-bio { column-width: auto; column-count: 1; }
-    .head { grid-template-columns: minmax(0, 7rem) minmax(0, 1fr); gap: var(--s-4); }
-    .plate { aspect-ratio: 1 / 1; }
+    .plates { grid-template-columns: minmax(0, 1fr); }
     .roll li { grid-template-columns: minmax(0, 1fr); gap: var(--s-1); }
     .roll-campus { text-align: left; }
   }
