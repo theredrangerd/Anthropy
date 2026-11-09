@@ -43,8 +43,7 @@ const bioHtml = (bio?: string) => {
       <h1 id="lead-h">Leadership</h1>
       {current && (
         <p class="masthead-year">
-          <span class="year">{current.data.academicYear}</span>
-          <span class="year-note">Leadership changes every year. These are the people behind this one.</span>
+          <span class="year">{current.data.academicYear.split("–")[0]}<span class="dash">–</span>{current.data.academicYear.split("–")[1]}</span>
         </p>
       )}
     </header>
@@ -153,9 +152,15 @@ const bioHtml = (bio?: string) => {
     </section>
   )}
 
+  {previous.length > 0 && (
+    <section class="block alumni-head" aria-labelledby="alumni-h">
+      <h2 id="alumni-h">Alumni</h2>
+    </section>
+  )}
+
   {previous.map((y) => (
     <section class="block archive" id={`year-${y.data.startYear}`} aria-labelledby={`h-${y.data.startYear}`}>
-      <h2 id={`h-${y.data.startYear}`}>{y.data.academicYear}</h2>
+      <h3 id={`h-${y.data.startYear}`}>{y.data.academicYear}</h3>
       {y.data.members.length === 0 ? (
         <p class="empty">Roster not yet recorded.</p>
       ) : (
@@ -164,7 +169,6 @@ const bioHtml = (bio?: string) => {
             <li>
               <span class="roll-name">{m.name}</span>
               <span class="roll-role">{m.role}</span>
-              <span class="roll-campus">{m.campus}</span>
             </li>
           ))}
         </ul>
@@ -180,33 +184,36 @@ const bioHtml = (bio?: string) => {
   :global(:root) { --photo-chair: 15rem; --photo-head: 11rem; --photo-mentor: 9.5rem; }
 
   .masthead { display: grid; gap: var(--s-16); padding-block: var(--s-16) var(--s-24); }
+  /* Title and academic year share one baseline at one size: the year is the other half of the masthead. */
   .masthead-head {
-    display: grid;
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-    gap: var(--s-12);
-    align-items: end;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    column-gap: var(--s-12);
+    row-gap: var(--s-2);
   }
-  .masthead h1 { font-size: clamp(2.4rem, 9vw, 4.5rem); overflow-wrap: anywhere; }
-  .masthead-year {
-    display: grid;
-    gap: var(--s-3);
-    border-top: 1px solid var(--c-brass);
-    padding-top: var(--s-3);
-  }
+  .masthead h1 { font-size: clamp(2.4rem, 9vw, 4.5rem); line-height: 1; overflow-wrap: anywhere; }
+  .masthead-year { margin: 0; line-height: 1; }
   .masthead-year .year {
     font-family: var(--f-display);
-    font-size: 2.6rem;
+    font-size: clamp(2.4rem, 9vw, 4.5rem);
+    font-weight: 400;
+    font-style: italic;
     line-height: 1;
+    letter-spacing: -0.01em;
     color: var(--c-brass);
     font-variant-numeric: lining-nums;
+    white-space: nowrap;
   }
-  .year-note { font-size: var(--t-sm); color: var(--c-on-navy-soft); max-width: 34ch; }
+  .masthead-year .dash { margin-inline: 0.04em; opacity: 0.6; }
+  .masthead-year { padding-right: 0.08em; }
 
   /* One role voice across the page: Caslon italic, sentence case. */
   .role { font-family: var(--f-display); font-style: italic; font-size: var(--t-base); color: var(--c-ink-soft); }
   .band.lift .role { color: var(--c-brass); font-size: var(--t-lg); }
 
-  /* Co-chairs: one ruled row each, portrait left, name over bio right. */
+  /* Co-chairs are equals: identical treatment, same motion timing, and side by side on wide screens so neither reads first. */
   .chairs { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-12); }
   .chair {
     position: relative;
@@ -225,7 +232,6 @@ const bioHtml = (bio?: string) => {
     transform-origin: left;
     animation: rule-draw 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
-  .chair:nth-child(2)::before { animation-delay: 140ms; }
   .chair-text { display: grid; gap: var(--s-4); align-content: start; }
   .chair-name {
     font-size: clamp(2.2rem, 1.4rem + 3vw, 3.6rem);
@@ -234,7 +240,6 @@ const bioHtml = (bio?: string) => {
     color: var(--c-on-navy);
     animation: name-rise 800ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
   }
-  .chair:nth-child(2) .chair-name { animation-delay: 260ms; }
   .chair-text .role { margin-top: calc(var(--s-2) * -1); }
   /* Two columns of about 50 characters. */
   .chair-bio {
@@ -311,7 +316,9 @@ const bioHtml = (bio?: string) => {
   .head .bio { margin-top: var(--s-2); }
 
   /* Mentors: the smallest portraits, three across. */
-  .mentors { margin-top: var(--s-8); margin-bottom: calc(var(--s-24) * -1); }
+  .mentors { margin-top: var(--s-8); }
+  /* Last on the page, the band runs into the footer. */
+  .mentors:last-child { margin-bottom: calc(var(--s-24) * -1); }
   .plates { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-12) var(--s-8); }
   .mentor { display: grid; gap: var(--s-2); align-content: start; }
   /* Printed-plate treatment: a white mat, a hairline brass keyline inside it,
@@ -369,7 +376,7 @@ const bioHtml = (bio?: string) => {
   .roll { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--c-brass); }
   .roll li {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: var(--s-4);
     align-items: baseline;
     padding-block: var(--s-3);
@@ -377,11 +384,20 @@ const bioHtml = (bio?: string) => {
   }
   .roll-name { font-family: var(--f-display); font-size: var(--t-lg); }
   .roll-role { font-size: var(--t-sm); color: var(--c-ink-soft); }
-  .roll-campus { font-size: var(--t-xs); color: var(--c-ink-faint); text-align: right; }
+  .alumni-head { padding-bottom: 0; }
+  .archive { padding-block: var(--s-8) 0; }
+  .archive:last-child { padding-bottom: var(--s-8); }
+  .archive h3 { font-size: var(--t-xl); color: var(--c-navy); }
+
+  @media (min-width: 1000px) {
+    .chairs { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s-16); align-items: start; }
+    .chair { grid-template-columns: minmax(0, 1fr); row-gap: var(--s-6); }
+    .chair-bio { column-count: 1; column-width: auto; }
+    .chair-name { font-size: clamp(2rem, 2.2vw + 0.6rem, 2.7rem); white-space: nowrap; }
+  }
 
   @media (max-width: 860px) {
     .masthead { gap: var(--s-12); padding-block: var(--s-12); }
-    .masthead-head { grid-template-columns: minmax(0, 1fr); gap: var(--s-8); }
     :global(:root) { --photo-chair: 10rem; --photo-head: 8rem; }
     .chair { column-gap: var(--s-8); }
     .heads { grid-template-columns: minmax(0, 1fr); }
@@ -393,7 +409,6 @@ const bioHtml = (bio?: string) => {
     .chair-bio { column-width: auto; column-count: 1; }
     .plates { grid-template-columns: minmax(0, 1fr); }
     .roll li { grid-template-columns: minmax(0, 1fr); gap: var(--s-1); }
-    .roll-campus { text-align: left; }
   }
   @media (prefers-reduced-motion: reduce) {
     .plate img { transition: none; }
