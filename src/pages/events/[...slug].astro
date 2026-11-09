@@ -14,12 +14,14 @@ export async function getStaticPaths() {
 
 const { event } = Astro.props;
 const { Content } = await render(event);
+const base = import.meta.env.BASE_URL;
 const kind = event.data.format === 'week' ? 'Week-long programme' : 'One-day forum';
 ---
 <ProseLayout
   title={event.data.name}
   description={event.data.summary}
   eyebrow={`${kind} · ${formatEventDate(event.data.startsAt)}`}
+  back={{ href: `${base}events/`, label: 'All events' }}
 >
   <Content />
 </ProseLayout>

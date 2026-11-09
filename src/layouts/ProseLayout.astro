@@ -4,18 +4,21 @@ import BaseLayout from './BaseLayout.astro';
 interface Props {
   title: string;
   description: string;
+  /** Discipline and date, or kind and date: shown under the byline. */
   eyebrow: string;
   byline?: string;
+  back?: { href: string; label: string };
 }
 
-const { title, description, eyebrow, byline } = Astro.props;
+const { title, description, eyebrow, byline, back } = Astro.props;
 ---
 <BaseLayout title={title} description={description}>
   <article class="doc">
+    {back && <a class="back" href={back.href}>{back.label}</a>}
     <header>
-      <p class="eyebrow">{eyebrow}</p>
       <h1>{title}</h1>
       {byline && <p class="byline">{byline}</p>}
+      <p class="meta">{eyebrow}</p>
     </header>
     <div class="prose">
       <slot />
@@ -24,16 +27,61 @@ const { title, description, eyebrow, byline } = Astro.props;
 </BaseLayout>
 
 <style>
+  /* One centred reading column: title, byline and text share its edges. */
   .doc {
-    padding-block: var(--s-16);
+    --column: min(100%, 44rem);
+    padding-block: var(--s-12) var(--s-24);
     display: grid;
-    gap: var(--s-12);
+    justify-items: center;
+    gap: var(--s-8);
   }
-  header { display: grid; gap: var(--s-3); max-width: var(--measure); }
-  h1 { font-size: var(--t-2xl); }
+  .doc > * { width: var(--column); }
+  .back {
+    font-size: var(--t-sm);
+    color: var(--c-ink-soft);
+    text-decoration: none;
+    justify-self: center;
+  }
+  .back:hover { color: var(--c-navy); text-decoration: underline; text-decoration-color: var(--c-brass); text-underline-offset: 0.2em; }
+  header {
+    display: grid;
+    gap: var(--s-4);
+    padding-bottom: var(--s-8);
+    border-bottom: 2px solid var(--c-brass);
+  }
+  h1 {
+    font-size: clamp(1.9rem, 1.3rem + 2.4vw, 2.9rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
   .byline {
-    font-family: var(--f-prose);
+    font-family: var(--f-display);
     font-style: italic;
+    font-size: var(--t-lg);
+    color: var(--c-navy);
+  }
+  .meta { font-size: var(--t-sm); color: var(--c-ink-soft); }
+  .prose { max-width: none; }
+  .prose :global(a) { text-decoration-color: var(--c-brass); text-underline-offset: 0.18em; overflow-wrap: anywhere; }
+  .prose :global(a:hover) { text-decoration-color: var(--c-navy); }
+  .prose :global(h2) { text-wrap: balance; padding-top: var(--s-2); }
+
+  /* Reference lists: hanging indent, one entry per block, smaller than the text. */
+  .prose :global(:is(#works-cited, #bibliography, #references, #sources) + ul) {
+    list-style: none;
+    padding: 0;
+    font-size: 0.98rem;
+    line-height: 1.55;
     color: var(--c-ink-soft);
   }
+  .prose :global(:is(#works-cited, #bibliography, #references, #sources) + ul > li) {
+    padding-left: 1.6rem;
+    text-indent: -1.6rem;
+    margin-top: var(--s-3);
+    overflow-wrap: anywhere;
+  }
+  .prose :global(img), .prose :global(table) { max-width: 100%; }
+  .prose :global(table) { display: block; overflow-x: auto; }
 </style>
