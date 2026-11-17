@@ -2,8 +2,8 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import RevisionReveal from '../components/RevisionReveal.astro';
-import { excludeDrafts, sortByDateDesc, sortByDateAsc } from '../lib/collections';
-import { formatIssueDate, formatEventDate } from '../lib/format';
+import { excludeDrafts, sortByDateDesc } from '../lib/collections';
+import { formatIssueDate } from '../lib/format';
 import site from '../data/site.json';
 
 const allArticles = sortByDateDesc(
@@ -19,11 +19,6 @@ const allIssues = sortByDateDesc(
   (i) => i.data.publishedAt,
 );
 const [latestIssue, ...earlierIssues] = allIssues;
-
-const upcoming = sortByDateAsc(
-  excludeDrafts(await getCollection('events')).filter((e) => e.data.upcoming),
-  (e) => e.data.startsAt,
-);
 
 const countWord = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 const base = import.meta.env.BASE_URL;
@@ -164,19 +159,6 @@ const base = import.meta.env.BASE_URL;
     </div>
   </section>
 
-  <section class="run events" aria-labelledby="events-h" style={`--photo: url(${base}events/hfw-question.jpg)`}>
-    <div class="events-copy">
-      <h3 id="events-h"><a href={`${base}events/`}>Events</a></h3>
-      <p class="panel-lede">
-        Our speaker programme brings researchers and academics into the school library to talk
-        about their work, then answers to the students who put questions to them directly.
-        {upcoming.length > 0 && (
-          <span class="next"> Next: {formatEventDate(upcoming[0].data.startsAt)}.</span>
-        )}
-      </p>
-      <a class="panel-link" href={`${base}events/`}>Humanities Focus, past and present <span aria-hidden="true">→</span></a>
-    </div>
-  </section>
 </BaseLayout>
 
 <script>
@@ -431,35 +413,12 @@ const base = import.meta.env.BASE_URL;
   .shelf img { display: block; width: 100%; height: auto; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35), 0 22px 36px -14px rgba(0, 0, 0, 0.55); }
   .shelf-note { font-family: var(--f-ui); font-size: var(--t-sm); color: var(--c-on-navy-soft); }
 
-  /* Events: the same navy, over the photograph of the room it takes place in. */
-  .run.events {
-    position: relative;
-    isolation: isolate;
-    display: grid;
-    align-items: end;
-    min-height: clamp(24rem, 42vw, 32rem);
-    padding-block: var(--s-24) var(--s-16);
-    margin-bottom: calc(var(--s-24) * -1);
-  }
-  .run.events::before {
-    content: '';
-    position: absolute;
-    inset: 0 calc(50% - 50vw);
-    z-index: -1;
-    background:
-      linear-gradient(90deg, rgb(21 34 47 / 0.92) 0%, rgb(21 34 47 / 0.7) 42%, rgb(21 34 47 / 0.15) 100%),
-      var(--photo) 0 28% / 125% auto no-repeat;
-  }
-  .events-copy { display: grid; gap: var(--s-6); max-width: 34rem; }
-  .next { font-family: var(--f-ui); font-size: var(--t-base); font-weight: 600; white-space: nowrap; }
-
   @media (max-width: 860px) {
     .hero { grid-template-columns: 1fr; gap: var(--s-12); padding-block: var(--s-12) var(--s-16); }
     .hero-cover { max-width: 320px; }
     .papers-grid { grid-template-columns: 1fr; gap: var(--s-8); }
     .i2a-panel { grid-template-columns: 1fr; gap: var(--s-12); }
     .shelf { max-width: 26rem; }
-    .run.events::before { background: linear-gradient(0deg, rgb(21 34 47 / 0.94) 0%, rgb(21 34 47 / 0.72) 55%, rgb(21 34 47 / 0.3) 100%), var(--photo) 35% 30% / cover no-repeat; }
     .run h3 { font-size: var(--t-2xl); }
     .rotary { grid-template-rows: auto auto; padding: var(--s-6) 0 0; border-left: 0; border-top: 1px solid var(--c-rule); }
   }

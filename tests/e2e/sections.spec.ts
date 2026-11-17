@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const ROUTES = [
-  '/', '/journal/', '/articles/', '/events/',
+  '/', '/journal/', '/articles/', 
   '/in2academia/', '/leadership/', '/about/', '/contact/',
 ];
 
@@ -26,17 +26,6 @@ test('no page leaks template or placeholder markers', async ({ page }) => {
     await expect(page.locator('body'), route).not.toContainText('REPLACE_WITH');
     await expect(page.locator('body'), route).not.toContainText('PENDING —');
   }
-});
-
-test('events page explains the week-to-forum change rather than implying inconsistency', async ({ page }) => {
-  await page.goto('/events/');
-  await expect(page.locator('.lede')).toContainText('single-day forum');
-});
-
-test('events "Next" section, when present, uses the featured treatment', async ({ page }) => {
-  await page.goto('/events/');
-  const featuredCount = await page.locator('.featured-item').count();
-  expect(featuredCount).toBeLessThanOrEqual(1);
 });
 
 test('no page describes Anthropy as multi-campus', async ({ page }) => {

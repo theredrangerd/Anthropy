@@ -35,21 +35,6 @@ const articles = defineCollection({
   }),
 });
 
-const events = defineCollection({
-  loader: glob({ base: './src/content/events', pattern: '**/*.{md,mdx}' }),
-  schema: z.object({
-    /** Display name. The 2026 one-day format's final name is still pending —
-     *  it is set here, never hard-coded in a template. */
-    name: z.string(),
-    year: z.number().int(),
-    format: z.enum(['week', 'forum']),
-    startsAt: z.coerce.date(),
-    summary: z.string(),
-    upcoming: z.boolean().default(false),
-    draft: z.boolean().default(false),
-  }),
-});
-
 const leadership = defineCollection({
   loader: glob({ base: './src/content/leadership', pattern: '**/*.{md,mdx}' }),
   schema: z.object({
@@ -79,4 +64,4 @@ const leadership = defineCollection({
   }),
 });
 
-export const collections = { journal, articles, events, leadership };
+export const collections = { journal, articles, leadership };

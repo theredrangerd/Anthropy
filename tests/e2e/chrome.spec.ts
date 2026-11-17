@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const NAV = ['Journal', 'Articles', 'Events', 'In2Academia', 'Leadership', 'About', 'Contact'];
+const NAV = ['Journal', 'Articles', 'In2Academia', 'Leadership', 'About', 'Contact'];
 
 test('primary nav lists every section in audience-priority order', async ({ page }) => {
   await page.goto('/');

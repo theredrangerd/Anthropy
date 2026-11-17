@@ -8,7 +8,7 @@ test('final text is correct without the animation having run', async ({ page }) 
 });
 
 test('the effect is contained to one placement site-wide', async ({ page }) => {
-  const routes = ['/', '/journal/', '/articles/', '/events/', '/in2academia/', '/leadership/', '/about/', '/contact/'];
+  const routes = ['/', '/journal/', '/articles/', '/in2academia/', '/leadership/', '/about/', '/contact/'];
   let total = 0;
   for (const route of routes) {
     await page.goto(route);
